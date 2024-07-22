@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import {
   BaseBoxShapeUtil,
+  BoundsSnapGeometry,
   HTMLContainer,
   T,
   TLBaseShape,
@@ -37,6 +38,20 @@ export class AIComponentUtil extends BaseBoxShapeUtil<AIComponentShape> {
       w: 0,
       h: 0,
       componentCode: '',
+    };
+  }
+
+  override getBoundsSnapGeometry(shape: AIComponentShape): BoundsSnapGeometry {
+    const { w, h } = shape.props;
+
+    return {
+      points: [
+        { x: 0, y: 0 },
+        { x: w, y: 0 },
+        { x: w, y: h },
+        { x: 0, y: h },
+        { x: w / 2, y: h / 2 },
+      ],
     };
   }
 
@@ -114,7 +129,7 @@ export class AIComponentUtil extends BaseBoxShapeUtil<AIComponentShape> {
         w / dimensions.width,
         h / dimensions.height
       )})`,
-      transformOrigin: 'center',
+      transformOrigin: 'center center',
     };
 
     return (

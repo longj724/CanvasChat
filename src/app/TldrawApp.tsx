@@ -15,6 +15,7 @@ function TldrawWithAIComponent() {
             props: { w: 1000, h: 1000, componentCode: 'hello' },
           },
         ]);
+        editor.user.updateUserPreferences({ isSnapMode: true });
       }}
     />
   );
