@@ -9,6 +9,8 @@ import {
   useEditor,
 } from 'tldraw';
 import ExampleCard from './exampleCard';
+import TestSidebar from '@/components/testSidebar';
+import ComponentContainer from '@/components/componentContainer';
 
 type AIComponentShape = TLBaseShape<
   'ai-component',
@@ -144,10 +146,12 @@ export class AIComponentUtil extends BaseBoxShapeUtil<AIComponentShape> {
       >
         <div style={containerStyle}>
           <div style={contentStyle}>
-            <ExampleCard
+            <ComponentContainer
               ref={ref}
               onDimensionsChange={handleDimensionsChange}
-            />
+            >
+              <TestSidebar />
+            </ComponentContainer>
           </div>
         </div>
       </HTMLContainer>
