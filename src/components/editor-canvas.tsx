@@ -1,3 +1,4 @@
+// External Dependencies
 import { useCallback, useMemo, useState } from 'react';
 import {
   addEdge,
@@ -9,14 +10,14 @@ import {
   EdgeChange,
   MiniMap,
   NodeChange,
+  Position,
   ReactFlow,
   useEdgesState,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import MessageNode, { MessageType } from './customNode';
-
-// import './text-updater-node.css';
+// Relative Dependencies
+import MessageNode from './customNode';
 
 const initialNodes = [
   {
@@ -28,24 +29,24 @@ const initialNodes = [
       userMessage: 'User Message',
       responseMessage: 'Response Message',
       pastMessages: [],
+      createdFrom: null,
     },
   },
   {
     id: '2',
     type: 'messageNode',
-    position: { x: 40, y: 40 },
+    position: { x: 100, y: 100 },
     data: {
       systemMessage: 'System Message',
       userMessage: 'User Message',
       responseMessage: 'Response Message',
       pastMessages: [],
+      createdFrom: Position.Top,
     },
   },
 ];
 
-const initialEdges = [
-  { id: '1->2', type: 'custom-edge', source: '1', target: '2' },
-];
+const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
 function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -85,6 +86,7 @@ function Flow() {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
+      // @ts-ignore - not sure why it doesn't like width and height
       nodeTypes={nodeTypes}
       fitView
     >

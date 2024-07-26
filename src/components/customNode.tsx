@@ -1,5 +1,16 @@
-import { useCallback } from 'react';
-import { Handle, Position, useReactFlow } from '@xyflow/react';
+// External Dependencies
+import { useCallback, useMemo } from 'react';
+import {
+  Handle,
+  Position,
+  useReactFlow,
+  NodeProps,
+  useEdges,
+} from '@xyflow/react';
+import { PlusCircle, Trash } from 'lucide-react';
+
+// Relative Dependencies
+import CustomPlusHandle from './customHandle';
 import {
   Card,
   CardContent,
@@ -10,7 +21,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { PlusCircle } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -33,18 +43,114 @@ export interface MessageType {
   userMessage: string | null;
   responseMessage: string | null;
   pastMessages: Message[];
+  createdFrom: Position | null;
 }
 
-const MessageNode = ({ data, id }: { data: MessageType; id: string }) => {
+const MessageNode = ({
+  data,
+  height,
+  id,
+  positionAbsoluteX,
+  positionAbsoluteY,
+  width,
+}: {
+  data: MessageType;
+  height: number;
+  id: string;
+  positionAbsoluteX: number;
+  positionAbsoluteY: number;
+  width: number;
+}) => {
+  const {
+    createdFrom,
+    pastMessages,
+    responseMessage,
+    systemMessage,
+    userMessage,
+  } = data;
+
   const reactFlowInstance = useReactFlow();
-  const { systemMessage, userMessage, responseMessage, pastMessages } = data;
+  const edges = useEdges();
+
+  const hasBottomEdge = useMemo(() => {
+    return edges.some((edge) => edge.source === id);
+  }, [id, edges]);
+
+  const handleAddBottomNode = useCallback(() => {
+    const newNodeId = `${id}-child-${Date.now()}`;
+    const newNode = {
+      id: newNodeId,
+      position: {
+        x: positionAbsoluteX,
+        y: positionAbsoluteY + height + 100,
+      },
+      data: {
+        systemMessage: null,
+        userMessage: null,
+        responseMessage: null,
+        pastMessages: [],
+        createdFrom: Position.Bottom,
+      },
+      type: 'messageNode',
+    };
+
+    const newEdge = {
+      id: `${id}-${newNodeId}`,
+      source: id,
+      target: newNodeId,
+    };
+
+    reactFlowInstance.addNodes(newNode);
+    reactFlowInstance.addEdges(newEdge);
+  }, [id, positionAbsoluteX, positionAbsoluteY, reactFlowInstance]);
+
+  const handleAddRightNode = useCallback(() => {
+    const newNodeId = `${id}-child-${Date.now()}`;
+    const newNode = {
+      id: newNodeId,
+      position: {
+        x: positionAbsoluteX + width + 200,
+        y: positionAbsoluteY,
+      },
+      data: {
+        systemMessage: null,
+        userMessage: null,
+        responseMessage: null,
+        pastMessages: [],
+        createdFrom: Position.Right,
+      },
+      type: 'messageNode',
+    };
+
+    const newEdge = {
+      id: `${id}-${newNodeId}`,
+      source: id,
+      target: newNodeId,
+      sourceHandle: Position.Right,
+      targetHandle: Position.Left,
+    };
+
+    reactFlowInstance.addNodes(newNode);
+    reactFlowInstance.addEdges(newEdge);
+  }, [id, positionAbsoluteX, positionAbsoluteY, reactFlowInstance]);
+
+  const handleDeleteNode = useCallback(() => {
+    reactFlowInstance.deleteElements({ nodes: [{ id }] });
+  }, [id, reactFlowInstance]);
 
   return (
     <>
-      <Handle type="target" position={Position.Top} />
-      <Card className="w-[450px]">
-        <CardHeader>
+      {/* Handles */}
+      {createdFrom !== null && <Handle type="target" position={Position.Top} />}
+      <Handle type="target" position={Position.Bottom} id="bottom" />
+      <Handle type="source" position={Position.Bottom} id="bottom" />
+
+      <Card className="w-[600px]">
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg text-center">Chat Node </CardTitle>
+          <Button size={'icon'} className="ml-auto">
+            <Trash onClick={handleDeleteNode} />
+          </Button>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[200px] w-full pr-4">
@@ -87,7 +193,7 @@ const MessageNode = ({ data, id }: { data: MessageType; id: string }) => {
             </Button>
           </form>
           <Button
-            onClick={() => {}}
+            onClick={handleAddBottomNode}
             size="sm"
             variant="outline"
             className="w-full"
@@ -96,7 +202,6 @@ const MessageNode = ({ data, id }: { data: MessageType; id: string }) => {
           </Button>
         </CardFooter>
       </Card>
-      <Handle type="source" position={Position.Bottom} />
     </>
   );
 };
