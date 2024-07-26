@@ -10,6 +10,7 @@ import {
   EdgeChange,
   MiniMap,
   NodeChange,
+  PanOnScrollMode,
   Position,
   ReactFlow,
   useEdgesState,
@@ -19,36 +20,46 @@ import '@xyflow/react/dist/style.css';
 // Relative Dependencies
 import MessageNode from './customNode';
 
-const initialNodes = [
-  {
-    id: '1',
-    type: 'messageNode',
-    position: { x: 0, y: 0 },
-    data: {
-      systemMessage: 'System Message',
-      userMessage: 'User Message',
-      responseMessage: 'Response Message',
-      pastMessages: [],
-      createdFrom: null,
-    },
-  },
-  {
-    id: '2',
-    type: 'messageNode',
-    position: { x: 100, y: 100 },
-    data: {
-      systemMessage: 'System Message',
-      userMessage: 'User Message',
-      responseMessage: 'Response Message',
-      pastMessages: [],
-      createdFrom: Position.Top,
-    },
-  },
-];
-
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
-function Flow() {
+const Flow = () => {
+  const [isScrollMode, setIsScrollMode] = useState(false);
+
+  const toggleScrollMode = useCallback(() => {
+    setIsScrollMode((prev) => !prev);
+  }, [isScrollMode]);
+
+  const initialNodes = useMemo(() => {
+    return [
+      {
+        id: '1',
+        type: 'messageNode',
+        position: { x: 0, y: 0 },
+        data: {
+          systemMessage: 'System Message',
+          userMessage: 'User Message',
+          responseMessage: 'Response Message',
+          pastMessages: [],
+          createdFrom: null,
+          toggleScrollMode,
+        },
+      },
+      {
+        id: '2',
+        type: 'messageNode',
+        position: { x: 100, y: 100 },
+        data: {
+          systemMessage: 'System Message',
+          userMessage: 'User Message',
+          responseMessage: 'Response Message',
+          pastMessages: [],
+          createdFrom: Position.Top,
+          toggleScrollMode,
+        },
+      },
+    ];
+  }, []);
+
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useEdgesState(initialEdges);
 
@@ -88,7 +99,19 @@ function Flow() {
       onConnect={onConnect}
       // @ts-ignore - not sure why it doesn't like width and height
       nodeTypes={nodeTypes}
-      fitView
+      edgesUpdatable={!isScrollMode}
+      edgesFocusable={!isScrollMode}
+      nodesDraggable={!isScrollMode}
+      nodesConnectable={!isScrollMode}
+      nodesFocusable={!isScrollMode}
+      draggable={!isScrollMode}
+      panOnDrag={!isScrollMode}
+      elementsSelectable={!isScrollMode}
+      zoomOnScroll={!isScrollMode}
+      zoomOnPinch={!isScrollMode}
+      panOnScrollMode={PanOnScrollMode.Vertical}
+      panOnScroll={isScrollMode}
+      panOnScrollSpeed={1}
     >
       <Controls position="top-right" />
       <MiniMap
@@ -100,6 +123,6 @@ function Flow() {
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
     </ReactFlow>
   );
-}
+};
 
 export default Flow;

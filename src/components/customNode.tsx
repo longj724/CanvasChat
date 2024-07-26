@@ -1,13 +1,7 @@
 // External Dependencies
 import { useCallback, useMemo } from 'react';
-import {
-  Handle,
-  Position,
-  useReactFlow,
-  NodeProps,
-  useEdges,
-} from '@xyflow/react';
-import { PlusCircle, Trash } from 'lucide-react';
+import { Handle, Position, useReactFlow, useEdges } from '@xyflow/react';
+import { LocateFixed, PlusCircle, Scroll, Trash } from 'lucide-react';
 
 // Relative Dependencies
 import CustomPlusHandle from './customHandle';
@@ -44,6 +38,7 @@ export interface MessageType {
   responseMessage: string | null;
   pastMessages: Message[];
   createdFrom: Position | null;
+  toggleScrollMode: () => void;
 }
 
 const MessageNode = ({
@@ -66,10 +61,11 @@ const MessageNode = ({
     pastMessages,
     responseMessage,
     systemMessage,
+    toggleScrollMode,
     userMessage,
   } = data;
 
-  const reactFlowInstance = useReactFlow();
+  const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
   const edges = useEdges();
 
   const hasBottomEdge = useMemo(() => {
@@ -78,11 +74,13 @@ const MessageNode = ({
 
   const handleAddBottomNode = useCallback(() => {
     const newNodeId = `${id}-child-${Date.now()}`;
+    // TODO: Fix height bug where height is 0 before the node is interacted with
+    const nodeHeight = height === 0 ? 420 : height;
     const newNode = {
       id: newNodeId,
       position: {
         x: positionAbsoluteX,
-        y: positionAbsoluteY + height + 100,
+        y: positionAbsoluteY + nodeHeight + 100,
       },
       data: {
         systemMessage: null,
@@ -90,6 +88,7 @@ const MessageNode = ({
         responseMessage: null,
         pastMessages: [],
         createdFrom: Position.Bottom,
+        toggleScrollMode,
       },
       type: 'messageNode',
     };
@@ -100,9 +99,9 @@ const MessageNode = ({
       target: newNodeId,
     };
 
-    reactFlowInstance.addNodes(newNode);
-    reactFlowInstance.addEdges(newEdge);
-  }, [id, positionAbsoluteX, positionAbsoluteY, reactFlowInstance]);
+    addNodes(newNode);
+    addEdges(newEdge);
+  }, [id, positionAbsoluteX, positionAbsoluteY, addNodes, addEdges]);
 
   const handleAddRightNode = useCallback(() => {
     const newNodeId = `${id}-child-${Date.now()}`;
@@ -118,6 +117,7 @@ const MessageNode = ({
         responseMessage: null,
         pastMessages: [],
         createdFrom: Position.Right,
+        toggleScrollMode,
       },
       type: 'messageNode',
     };
@@ -130,13 +130,20 @@ const MessageNode = ({
       targetHandle: Position.Left,
     };
 
-    reactFlowInstance.addNodes(newNode);
-    reactFlowInstance.addEdges(newEdge);
-  }, [id, positionAbsoluteX, positionAbsoluteY, reactFlowInstance]);
+    addNodes(newNode);
+    addEdges(newEdge);
+  }, [id, positionAbsoluteX, positionAbsoluteY, addNodes, addEdges]);
 
   const handleDeleteNode = useCallback(() => {
-    reactFlowInstance.deleteElements({ nodes: [{ id }] });
-  }, [id, reactFlowInstance]);
+    deleteElements({ nodes: [{ id }] });
+  }, [id, deleteElements]);
+
+  const handleCenterOnNode = useCallback(() => {
+    setCenter(positionAbsoluteX + width / 2, positionAbsoluteY + height / 2, {
+      zoom: 1,
+      duration: 800,
+    });
+  }, [positionAbsoluteX, positionAbsoluteY, setCenter]);
 
   return (
     <>
@@ -148,9 +155,17 @@ const MessageNode = ({
       <Card className="w-[600px]">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg text-center">Chat Node </CardTitle>
-          <Button size={'icon'} className="ml-auto">
-            <Trash onClick={handleDeleteNode} />
-          </Button>
+          <div className="flex items-center ml-auto gap-2">
+            <Button size={'icon'} className="ml-auto">
+              <LocateFixed onClick={handleCenterOnNode} />
+            </Button>
+            <Button size={'icon'} className="ml-auto">
+              <Scroll onClick={toggleScrollMode} />
+            </Button>
+            <Button size={'icon'} className="ml-auto">
+              <Trash onClick={handleDeleteNode} />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[200px] w-full pr-4">
