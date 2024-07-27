@@ -1,8 +1,7 @@
 'use client';
 
 // External Dependencies
-import { useCallback, useState } from 'react';
-import { PanelsTopLeft } from 'lucide-react';
+import { useState } from 'react';
 
 // Relative Dependencies
 import { cn } from '@/lib/utils';
@@ -12,10 +11,6 @@ import { SidebarToggle } from '@/components/sidebar/sidebar-toggle';
 export function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const toggleSidebar = useCallback(() => {
-    setSidebarOpen((prev) => !prev);
-  }, [setSidebarOpen]);
-
   return (
     <aside
       className={cn(
@@ -23,37 +18,8 @@ export function Sidebar() {
         sidebarOpen === false ? 'w-[65px]' : 'w-60'
       )}
     >
-      <SidebarToggle isOpen={sidebarOpen} setIsOpen={toggleSidebar} />
-      <div
-        className={cn(
-          sidebarOpen && 'px-3',
-          'relative h-full flex flex-col pt-4 overflow-y-auto shadow-md dark:shadow-zinc-800 overflow-hidden items-center'
-        )}
-      >
-        <div
-          className={cn(
-            'transition-transform ease-in-out duration-300 mb-1',
-            sidebarOpen === false ? 'translate-x-1' : 'translate-x-0'
-          )}
-        >
-          <div className="flex flex-row items-center">
-            <PanelsTopLeft
-              className={cn('w-6 h-6 mr-1', !sidebarOpen && 'mr-2')}
-            />
-            {sidebarOpen && (
-              <h1
-                className={cn(
-                  'font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300',
-                  'translate-x-0 opacity-100'
-                )}
-              >
-                FlowChat
-              </h1>
-            )}
-          </div>
-        </div>
-        <Menu isOpen={sidebarOpen} />
-      </div>
+      <SidebarToggle isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      <Menu isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
     </aside>
   );
 }

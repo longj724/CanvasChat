@@ -1,12 +1,18 @@
 'use client';
 
 // External Dependencies
-import { Ellipsis, LogOut, CircleUserRound } from 'lucide-react';
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
+import { Dispatch, SetStateAction } from 'react';
+import { CircleUserRound, PanelsTopLeft } from 'lucide-react';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from '@clerk/nextjs';
 
-import { cn } from '@/lib/utils';
+// Relative Dependencies
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Tooltip,
   TooltipTrigger,
@@ -16,70 +22,51 @@ import {
 
 interface MenuProps {
   isOpen: boolean | undefined;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export function Menu({ isOpen }: MenuProps) {
+export function Menu({ isOpen, setIsOpen }: MenuProps) {
   return (
-    <ScrollArea className="[&>div>div[style]]:!block">
-      <nav className="h-full w-full">
-        <ul
-          className={cn(
-            isOpen && 'px-2',
-            'flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-2'
-          )}
-        >
-          {isOpen ? (
-            <li className="gap-2">
-              <div className="mt-2">
-                <SignUpButton mode="modal">
-                  <Button>Sign up</Button>
-                </SignUpButton>
-              </div>
+    <nav className="flex flex-col h-full w-full">
+      <div className="flex flex-row h-14 items-center justify-center border-b  w-full gap-1">
+        <PanelsTopLeft className="h-6 w-6" />
+        {isOpen && <span className="">FlowChat</span>}
+      </div>
 
-              <div className="mt-2">
+      <SignedIn>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="justify-self-end self-end mb-2">
+            <UserButton showName={isOpen} />
+          </div>
+        </div>
+      </SignedIn>
+
+      <SignedOut>
+        <div className="flex flex-1 items-center justify-center">
+          {isOpen ? (
+            <div className="flex flex-col flex-1 items-center justify-center justify-self-end self-end mb-2">
+              <div className="mt-2 w-full flex items-center justify-center">
                 <SignInButton mode="modal">
-                  <Button>Sign in</Button>
+                  <Button className="w-4/5" variant={'outline'}>
+                    Sign in
+                  </Button>
                 </SignInButton>
               </div>
-            </li>
-          ) : (
-            <li>
-              <Button size={'icon'}>
-                <CircleUserRound className="w-6 h-4" />
-              </Button>
-            </li>
-          )}
 
-          {/* <li className="w-full grow flex items-end">
-            <TooltipProvider disableHoverableContent>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => {}}
-                    variant="outline"
-                    className={cn('w-full justify-center h-10 mt-5')}
-                  >
-                    <span className={cn(isOpen === false ? '' : 'mr-4')}>
-                      <LogOut size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        'whitespace-nowrap',
-                        isOpen === false ? 'opacity-0 hidden' : 'opacity-100'
-                      )}
-                    >
-                      Sign out
-                    </p>
-                  </Button>
-                </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">Sign out</TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
-          </li> */}
-        </ul>
-      </nav>
-    </ScrollArea>
+              <div className="mt-2 w-full flex items-center justify-center">
+                <SignUpButton mode="modal">
+                  <Button className="w-4/5">Sign up</Button>
+                </SignUpButton>
+              </div>
+            </div>
+          ) : (
+            <CircleUserRound
+              className="h-8 w-8 justify-self-end self-end mb-2 hover:cursor-pointer"
+              onClick={() => setIsOpen((prev) => !prev)}
+            />
+          )}
+        </div>
+      </SignedOut>
+    </nav>
   );
 }
