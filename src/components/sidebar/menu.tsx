@@ -1,7 +1,8 @@
 'use client';
 
 // External Dependencies
-import { Ellipsis, LogOut } from 'lucide-react';
+import { Ellipsis, LogOut, CircleUserRound } from 'lucide-react';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,9 +25,31 @@ export function Menu({ isOpen }: MenuProps) {
         <ul
           className={cn(
             isOpen && 'px-2',
-            'flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1'
+            'flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-2'
           )}
         >
+          {isOpen ? (
+            <li className="gap-2">
+              <div className="mt-2">
+                <SignUpButton mode="modal">
+                  <Button>Sign up</Button>
+                </SignUpButton>
+              </div>
+
+              <div className="mt-2">
+                <SignInButton mode="modal">
+                  <Button>Sign in</Button>
+                </SignInButton>
+              </div>
+            </li>
+          ) : (
+            <li>
+              <Button size={'icon'}>
+                <CircleUserRound className="w-6 h-4" />
+              </Button>
+            </li>
+          )}
+
           {/* <li className="w-full grow flex items-end">
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>

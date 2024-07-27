@@ -27,31 +27,31 @@ export function Sidebar() {
       <div
         className={cn(
           sidebarOpen && 'px-3',
-          'relative h-full flex flex-col py-4 overflow-y-auto shadow-md dark:shadow-zinc-800 overflow-hidden items-center'
+          'relative h-full flex flex-col pt-4 overflow-y-auto shadow-md dark:shadow-zinc-800 overflow-hidden items-center'
         )}
       >
-        <h1
+        <div
           className={cn(
             'transition-transform ease-in-out duration-300 mb-1',
             sidebarOpen === false ? 'translate-x-1' : 'translate-x-0'
           )}
         >
-          <div className="flex items-center">
+          <div className="flex flex-row items-center">
             <PanelsTopLeft
-              className={cn('w-6 h-6 mr-1', !sidebarOpen && 'mr-0')}
+              className={cn('w-6 h-6 mr-1', !sidebarOpen && 'mr-2')}
             />
-            <h1
-              className={cn(
-                'font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300',
-                sidebarOpen === false
-                  ? '-translate-x-96 opacity-0 hidden'
-                  : 'translate-x-0 opacity-100'
-              )}
-            >
-              FlowChat
-            </h1>
+            {sidebarOpen && (
+              <h1
+                className={cn(
+                  'font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300',
+                  'translate-x-0 opacity-100'
+                )}
+              >
+                FlowChat
+              </h1>
+            )}
           </div>
-        </h1>
+        </div>
         <Menu isOpen={sidebarOpen} />
       </div>
     </aside>
