@@ -19,6 +19,8 @@ import '@xyflow/react/dist/style.css';
 
 // Relative Dependencies
 import MessageNode from './customNode';
+import SettingsModal from './settings-modal';
+import { Sidebar } from './sidebar/sidebar';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
@@ -47,7 +49,7 @@ const Flow = () => {
       {
         id: '2',
         type: 'messageNode',
-        position: { x: 100, y: 100 },
+        position: { x: 0, y: 500 },
         data: {
           systemMessage: 'System Message',
           userMessage: 'User Message',
@@ -91,37 +93,41 @@ const Flow = () => {
   );
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      // @ts-ignore - not sure why it doesn't like width and height
-      nodeTypes={nodeTypes}
-      edgesUpdatable={!isScrollMode}
-      edgesFocusable={!isScrollMode}
-      nodesDraggable={!isScrollMode}
-      nodesConnectable={!isScrollMode}
-      nodesFocusable={!isScrollMode}
-      draggable={!isScrollMode}
-      panOnDrag={!isScrollMode}
-      elementsSelectable={!isScrollMode}
-      zoomOnScroll={!isScrollMode}
-      zoomOnPinch={!isScrollMode}
-      panOnScrollMode={PanOnScrollMode.Vertical}
-      panOnScroll={isScrollMode}
-      panOnScrollSpeed={1}
-    >
-      <Controls position="top-right" />
-      <MiniMap
-        position="bottom-left"
-        className="!bg-background"
-        zoomable
-        pannable
-      />
-      <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-    </ReactFlow>
+    <>
+      <Sidebar />
+      <SettingsModal />
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        // @ts-ignore - not sure why it doesn't like width and height
+        nodeTypes={nodeTypes}
+        edgesUpdatable={!isScrollMode}
+        edgesFocusable={!isScrollMode}
+        nodesDraggable={!isScrollMode}
+        nodesConnectable={!isScrollMode}
+        nodesFocusable={!isScrollMode}
+        draggable={!isScrollMode}
+        panOnDrag={!isScrollMode}
+        elementsSelectable={!isScrollMode}
+        zoomOnScroll={!isScrollMode}
+        zoomOnPinch={!isScrollMode}
+        panOnScrollMode={PanOnScrollMode.Vertical}
+        panOnScroll={isScrollMode}
+        panOnScrollSpeed={1}
+      >
+        <Controls position="top-right" />
+        <MiniMap
+          position="bottom-right"
+          className="!bg-background"
+          zoomable
+          pannable
+        />
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+      </ReactFlow>
+    </>
   );
 };
 
