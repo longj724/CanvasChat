@@ -2,7 +2,13 @@
 
 // External Dependencies
 import { Dispatch, SetStateAction } from 'react';
-import { CircleUserRound, PanelsTopLeft } from 'lucide-react';
+import {
+  CirclePlus,
+  CircleUserRound,
+  Ellipsis,
+  FolderIcon,
+  PanelsTopLeft,
+} from 'lucide-react';
 import {
   SignedIn,
   SignedOut,
@@ -12,6 +18,7 @@ import {
 } from '@clerk/nextjs';
 
 // Relative Dependencies
+import Space from './space';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -19,6 +26,7 @@ import {
   TooltipContent,
   TooltipProvider,
 } from '@/components/ui/tooltip';
+import CreateSpaceModal from '../modals/create-space-modal';
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -32,6 +40,43 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
         <PanelsTopLeft className="h-6 w-6" />
         {isOpen && <span className="">FlowChat</span>}
       </div>
+      {isOpen ? (
+        <>
+          <div className="flex flex-row items-center">
+            <h1 className="mt-3 ml-3 font-bold mb-2">Spaces</h1>
+            <div className="ml-auto mr-2 mt-3">
+              <TooltipProvider>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger className="w-full">
+                    <CreateSpaceModal />
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>New Space</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
+          <div className="flex flex-col w-full gap-2 justify-center items-center">
+            <Space />
+          </div>
+        </>
+      ) : (
+        <div className="mt-3">
+          <TooltipProvider>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger className="w-full">
+                <div className="flex w-full justify-center items-center">
+                  <CirclePlus className="h-6 w-6" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>New Space</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
 
       <SignedIn>
         <div className="flex flex-1 items-center justify-center">
