@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 // Relative Dependencies
 import { Button } from '@/components/ui/button';
@@ -24,12 +25,30 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useCreateSpace } from '@/hooks/use-create-space';
 
-type Props = {};
-
-const CreateSpaceModal = (props: Props) => {
+const CreateSpaceModal = () => {
   const [open, setOpen] = useState(false);
+  const mutation = useCreateSpace();
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (!data.name) {
+      toast.error('Name is required');
+    } else {
+      mutation.mutate(
+        {
+          name: data.name,
+        },
+        {
+          onSuccess: ({ data }) => {
+            // TODO: revalidate get spaces query
+            setOpen(false);
+            form.reset();
+          },
+        }
+      );
+    }
+  };
 
   const formSchema = z.object({
     name: z.string(),
@@ -49,27 +68,25 @@ const CreateSpaceModal = (props: Props) => {
     },
   });
 
-  const openCreateSpaceModal = () => {
-    console.log('clicked');
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <CirclePlus className="h-6 w-6" />
+        <CirclePlus
+          className="h-6 w-6"
+          onClick={() => setOpen((prev) => !prev)}
+        />
       </DialogTrigger>
       <DialogContent className="w-1/2 sm:w-3/5">
         <DialogHeader>
           <DialogTitle className="mb-2">Create Space</DialogTitle>
-          {/* <DialogDescription>Test Description</DialogDescription> */}
         </DialogHeader>
         <Form {...form}>
           <form
-            // onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col space-y-8"
           >
             <FormField
-              // control={form.control}
+              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center sm:gap-4 lg:gap-0">
