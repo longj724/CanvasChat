@@ -19,7 +19,7 @@ import '@xyflow/react/dist/style.css';
 
 // Relative Dependencies
 import MessageNode from './customNode';
-import SettingsModal from './settings-modal';
+import SettingsModal from './modals/settings-modal';
 import { Sidebar } from './sidebar/sidebar';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
