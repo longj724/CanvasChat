@@ -30,7 +30,7 @@ export const useCreateSpace = () => {
     onSuccess: () => {
       toast.success('Space created');
 
-      // queryClient.invalidateQueries({ queryKey: ['spaces'] });
+      queryClient.invalidateQueries({ queryKey: ['spaces'] });
     },
     onError: () => {
       toast.error('Failed to create space');

@@ -16,6 +16,7 @@ import Space from './space';
 import { Button } from '@/components/ui/button';
 import CreateSpaceModal from '../modals/create-space-modal';
 import { WithTooltip } from '../ui/with-tooltip';
+import { useGetSpaces } from '@/hooks/use-get-spaces';
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -23,6 +24,8 @@ interface MenuProps {
 }
 
 export function Menu({ isOpen, setIsOpen }: MenuProps) {
+  const { data } = useGetSpaces();
+
   return (
     <nav className="flex flex-col h-full w-full">
       <div className="flex flex-row h-14 items-center justify-center border-b  w-full gap-1">
@@ -42,7 +45,9 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
             </div>
           </div>
           <div className="flex flex-col w-full gap-2 justify-center items-center">
-            <Space />
+            {data?.spaces.map((space) => (
+              <Space key={space.id} space={space} />
+            ))}
           </div>
         </>
       ) : (
