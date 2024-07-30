@@ -26,6 +26,7 @@ const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
 const Flow = () => {
   const [isScrollMode, setIsScrollMode] = useState(false);
+  const [isEnteringText, setisEnteringText] = useState(true);
 
   const toggleScrollMode = useCallback(() => {
     setIsScrollMode((prev) => !prev);
@@ -39,11 +40,13 @@ const Flow = () => {
         position: { x: 0, y: 0 },
         data: {
           systemMessage: 'System Message',
-          userMessage: 'User Message',
+          userMessage: null,
           responseMessage: 'Response Message',
           pastMessages: [],
           createdFrom: null,
+          togglePanning: setisEnteringText,
           toggleScrollMode,
+          scrollModeEnabled: false,
         },
       },
       {
@@ -56,6 +59,7 @@ const Flow = () => {
           responseMessage: 'Response Message',
           pastMessages: [],
           createdFrom: Position.Top,
+          togglePanning: setisEnteringText,
           toggleScrollMode,
         },
       },
@@ -109,10 +113,10 @@ const Flow = () => {
         nodesDraggable={!isScrollMode}
         nodesConnectable={!isScrollMode}
         nodesFocusable={!isScrollMode}
-        draggable={!isScrollMode}
-        panOnDrag={!isScrollMode}
-        elementsSelectable={!isScrollMode}
-        zoomOnScroll={!isScrollMode}
+        draggable={!isScrollMode && isEnteringText}
+        panOnDrag={!isScrollMode && isEnteringText}
+        // elementsSelectable={!isScrollMode}
+        zoomOnScroll={!isScrollMode && isEnteringText}
         zoomOnPinch={!isScrollMode}
         panOnScrollMode={PanOnScrollMode.Vertical}
         panOnScroll={isScrollMode}

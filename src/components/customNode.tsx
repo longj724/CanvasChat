@@ -1,6 +1,14 @@
 // External Dependencies
-import { useCallback, useMemo } from 'react';
-import { Handle, Position, useReactFlow, useEdges } from '@xyflow/react';
+import { useCallback, useMemo, Dispatch, SetStateAction } from 'react';
+import {
+  Handle,
+  Position,
+  ReactFlowState,
+  useEdges,
+  useReactFlow,
+  useStore,
+  useStoreApi,
+} from '@xyflow/react';
 import { LocateFixed, PlusCircle, Scroll, Trash } from 'lucide-react';
 
 // Relative Dependencies
@@ -12,9 +20,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ChatInput from './ChatInput';
+import { cn } from '@/lib/utils';
+
+const selector = (state: ReactFlowState) => ({
+  nodes: state.nodes,
+  setNodes: state.setNodes,
+  isEnteringText: state.paneDragging,
+});
 
 interface Message {
   id: number;
@@ -39,6 +54,7 @@ export interface MessageType {
   pastMessages: Message[];
   createdFrom: Position | null;
   toggleScrollMode: () => void;
+  togglePanning: Dispatch<SetStateAction<boolean>>;
 }
 
 const MessageNode = ({
@@ -61,11 +77,15 @@ const MessageNode = ({
     pastMessages,
     responseMessage,
     systemMessage,
+    togglePanning,
     toggleScrollMode,
     userMessage,
   } = data;
 
   const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
+  const store = useStoreApi();
+  const { nodes } = useStore(selector);
+
   const edges = useEdges();
 
   const hasBottomEdge = useMemo(() => {
@@ -88,6 +108,7 @@ const MessageNode = ({
         responseMessage: null,
         pastMessages: [],
         createdFrom: Position.Bottom,
+        togglePanning,
         toggleScrollMode,
       },
       type: 'messageNode',
@@ -117,6 +138,7 @@ const MessageNode = ({
         responseMessage: null,
         pastMessages: [],
         createdFrom: Position.Right,
+        togglePanning,
         toggleScrollMode,
       },
       type: 'messageNode',
@@ -159,7 +181,13 @@ const MessageNode = ({
             <Button size={'icon'} className="ml-auto">
               <LocateFixed onClick={handleCenterOnNode} />
             </Button>
-            <Button size={'icon'} className="ml-auto">
+            <Button
+              size={'icon'}
+              className={cn(
+                'ml-auto',
+                !store.getState().nodesDraggable && 'bg-red-500'
+              )}
+            >
               <Scroll onClick={toggleScrollMode} />
             </Button>
             <Button size={'icon'} className="ml-auto">
@@ -168,7 +196,7 @@ const MessageNode = ({
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[200px] w-full pr-4">
+          {/* <ScrollArea className="h-[200px] w-full pr-4">
             {pastMessages.map((message) => (
               <div
                 key={message.id}
@@ -187,10 +215,8 @@ const MessageNode = ({
                 </div>
               </div>
             ))}
-          </ScrollArea>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <form
+          </ScrollArea> */}
+          {/* <form
             onSubmit={(e) => {
               e.preventDefault();
               // handleSendMessage();
@@ -206,7 +232,10 @@ const MessageNode = ({
             <Button type="submit" size="sm">
               Send
             </Button>
-          </form>
+          </form> */}
+          {!userMessage && <ChatInput togglePanning={togglePanning} />}
+        </CardContent>
+        <CardFooter className="flex-col">
           <Button
             onClick={handleAddBottomNode}
             size="sm"
