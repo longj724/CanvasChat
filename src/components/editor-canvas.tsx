@@ -26,7 +26,7 @@ const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
 const Flow = () => {
   const [isScrollMode, setIsScrollMode] = useState(false);
-  const [isEnteringText, setisEnteringText] = useState(true);
+  const [isEnteringText, setisEnteringText] = useState(false);
 
   const toggleScrollMode = useCallback(() => {
     setIsScrollMode((prev) => !prev);
@@ -113,10 +113,10 @@ const Flow = () => {
         nodesDraggable={!isScrollMode}
         nodesConnectable={!isScrollMode}
         nodesFocusable={!isScrollMode}
-        draggable={!isScrollMode && isEnteringText}
-        panOnDrag={!isScrollMode && isEnteringText}
+        draggable={!isScrollMode && !isEnteringText}
+        panOnDrag={!isScrollMode && !isEnteringText}
         // elementsSelectable={!isScrollMode}
-        zoomOnScroll={!isScrollMode && isEnteringText}
+        zoomOnScroll={!isScrollMode && !isEnteringText}
         zoomOnPinch={!isScrollMode}
         panOnScrollMode={PanOnScrollMode.Vertical}
         panOnScroll={isScrollMode}

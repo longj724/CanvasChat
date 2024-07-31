@@ -61,7 +61,7 @@ const ChatInput = ({ togglePanning }: ChatInputProps) => {
 
   return (
     <div
-      className="mb-4 mt-auto flex w-full z-50 cursor-text"
+      className="nowheel mb-4 mt-auto flex w-full z-50 cursor-text"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
       onClick={onClick}
