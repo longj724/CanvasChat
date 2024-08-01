@@ -23,9 +23,9 @@ export const messages = pgTable('message', {
     .$defaultFn(() => crypto.randomUUID()),
   userMessage: text('content'),
   response: text('response'),
-  modelId: text('model_id')
+  modelName: text('model_name')
     .notNull()
-    .references(() => models.id, { onDelete: 'cascade' }),
+    .references(() => models.name, { onDelete: 'cascade' }),
   spaceId: text('space_id')
     .notNull()
     .references(() => spaces.id, { onDelete: 'cascade' }),
@@ -35,7 +35,10 @@ export const messages = pgTable('message', {
 });
 
 export const messagesRelations = relations(messages, ({ one, many }) => ({
-  models: one(models, { fields: [messages.modelId], references: [models.id] }),
+  models: one(models, {
+    fields: [messages.modelName],
+    references: [models.name],
+  }),
   spaces: one(spaces, { fields: [messages.spaceId], references: [spaces.id] }),
   edges: many(edges),
 }));
@@ -59,10 +62,7 @@ export const edgesRelations = relations(edges, ({ one, many }) => ({
 }));
 
 export const models = pgTable('model', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text('name').notNull(),
+  name: text('name').notNull().primaryKey(),
   displayName: text('display_name'),
   contextWindow: integer('context_window').notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
