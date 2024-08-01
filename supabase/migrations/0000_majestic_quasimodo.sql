@@ -1,14 +1,8 @@
-CREATE TABLE IF NOT EXISTS "chat" (
+CREATE TABLE IF NOT EXISTS "edges" (
 	"id" text PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
-	"spaceId" text NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "chats_to_messages" (
-	"chat_id" text NOT NULL,
-	"message_id" text NOT NULL
+	"space_id" text NOT NULL,
+	"source_id" text,
+	"target_id" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "message" (
@@ -16,6 +10,8 @@ CREATE TABLE IF NOT EXISTS "message" (
 	"content" text,
 	"response" text,
 	"model_id" text NOT NULL,
+	"space_id" text NOT NULL,
+	"previous_message_context" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -54,25 +50,19 @@ CREATE TABLE IF NOT EXISTS "space" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "chat" ADD CONSTRAINT "chat_spaceId_space_id_fk" FOREIGN KEY ("spaceId") REFERENCES "public"."space"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "chats_to_messages" ADD CONSTRAINT "chats_to_messages_chat_id_chat_id_fk" FOREIGN KEY ("chat_id") REFERENCES "public"."chat"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "chats_to_messages" ADD CONSTRAINT "chats_to_messages_message_id_message_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."message"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "edges" ADD CONSTRAINT "edges_space_id_space_id_fk" FOREIGN KEY ("space_id") REFERENCES "public"."space"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "message" ADD CONSTRAINT "message_model_id_model_id_fk" FOREIGN KEY ("model_id") REFERENCES "public"."model"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "message" ADD CONSTRAINT "message_space_id_space_id_fk" FOREIGN KEY ("space_id") REFERENCES "public"."space"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
