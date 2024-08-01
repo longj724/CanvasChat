@@ -6,35 +6,34 @@ import { getAuth } from '@hono/clerk-auth';
 
 // Relative Dependencies
 import { db } from '@/db';
-import { spaces, messages } from '@/db/schema';
+import { edges, messages } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 const app = new Hono()
   .post(
-    '/create-chat',
+    '/create-root-message',
     zValidator(
       'json',
-
       z.object({
-        name: z.string(),
+        spaceId: z.string(),
       })
     ),
     async (c) => {
-      const { name } = c.req.valid('json');
+      const { spaceId } = c.req.valid('json');
       const auth = getAuth(c);
 
       if (!auth?.userId) {
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      const newSpace = await db
-        .insert(spaces)
-        .values({ name, userId: auth.userId })
+      const newMessage = await db
+        .insert(messages)
+        .values({ spaceId, modelName: 'gpt-4o' })
         .returning();
 
       return c.json({
         data: {
-          space: newSpace,
+          message: newMessage,
         },
       });
     }
@@ -43,7 +42,6 @@ const app = new Hono()
     '/',
     zValidator(
       'json',
-
       z.object({
         spaceId: z.string(),
       })
@@ -61,9 +59,15 @@ const app = new Hono()
         .from(messages)
         .where(eq(messages.spaceId, spaceId));
 
+      const allEdges = await db
+        .select()
+        .from(edges)
+        .where(eq(edges.spaceId, spaceId));
+
       return c.json({
         data: {
           messages: allMessages,
+          edges: allEdges,
         },
       });
     }

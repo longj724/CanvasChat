@@ -5,13 +5,14 @@ import { clerkMiddleware } from '@hono/clerk-auth';
 
 // Relative Dependencies
 import spaces from './spaces';
+import messages from './messages';
 
 export const runtime = 'nodejs';
 
 const app = new Hono().basePath('/api');
 app.use('*', clerkMiddleware());
 
-const routes = app.route('/spaces', spaces);
+const routes = app.route('/spaces', spaces).route('/messages', messages);
 
 export const GET = handle(app);
 export const POST = handle(app);
