@@ -53,7 +53,7 @@ export interface MessageType {
   responseMessage: string | null;
   pastMessages: Message[];
   createdFrom: Position | null;
-  toggleScrollMode: () => void;
+  toggleScrollMode: Dispatch<SetStateAction<boolean>>;
   togglePanning: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -84,7 +84,6 @@ const MessageNode = ({
 
   const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
   const store = useStoreApi();
-  const { nodes } = useStore(selector);
 
   const edges = useEdges();
 
@@ -188,7 +187,7 @@ const MessageNode = ({
                 !store.getState().nodesDraggable && 'bg-red-500'
               )}
             >
-              <Scroll onClick={toggleScrollMode} />
+              <Scroll onClick={() => toggleScrollMode((prev) => !prev)} />
             </Button>
             <Button size={'icon'} className="ml-auto">
               <Trash onClick={handleDeleteNode} />

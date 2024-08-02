@@ -21,16 +21,13 @@ import '@xyflow/react/dist/style.css';
 import MessageNode from './customNode';
 import SettingsModal from './modals/settings-modal';
 import { Sidebar } from './sidebar/sidebar';
+import AddMessageButton from './add-message-button';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
 const Flow = () => {
   const [isScrollMode, setIsScrollMode] = useState(false);
-  const [isEnteringText, setisEnteringText] = useState(false);
-
-  const toggleScrollMode = useCallback(() => {
-    setIsScrollMode((prev) => !prev);
-  }, [isScrollMode]);
+  const [isEnteringText, setIsEnteringText] = useState(false);
 
   const initialNodes = useMemo(() => {
     return [
@@ -44,8 +41,8 @@ const Flow = () => {
           responseMessage: 'Response Message',
           pastMessages: [],
           createdFrom: null,
-          togglePanning: setisEnteringText,
-          toggleScrollMode,
+          togglePanning: setIsEnteringText,
+          toggleScrollMode: setIsScrollMode,
           scrollModeEnabled: false,
         },
       },
@@ -59,8 +56,9 @@ const Flow = () => {
           responseMessage: 'Response Message',
           pastMessages: [],
           createdFrom: Position.Top,
-          togglePanning: setisEnteringText,
-          toggleScrollMode,
+          togglePanning: setIsEnteringText,
+          toggleScrollMod: setIsScrollMode,
+          scrollModeEnabled: false,
         },
       },
     ];
@@ -99,7 +97,11 @@ const Flow = () => {
   return (
     <>
       <Sidebar />
-      <SettingsModal />
+      {/* <SettingsModal /> */}
+      <AddMessageButton
+        togglePanning={setIsEnteringText}
+        toggleScrollMode={setIsScrollMode}
+      />
       <ReactFlow
         nodes={nodes}
         edges={edges}
