@@ -40,8 +40,7 @@ const CreateSpaceModal = () => {
           name: data.name,
         },
         {
-          onSuccess: ({ data }) => {
-            // TODO: revalidate get spaces query
+          onSuccess: () => {
             setOpen(false);
             form.reset();
           },
