@@ -1,7 +1,7 @@
 // External Dependencies
 import { Dispatch, SetStateAction } from 'react';
 import { PlusCircle } from 'lucide-react';
-import { useReactFlow, Position } from '@xyflow/react';
+import { useReactFlow, useStoreApi } from '@xyflow/react';
 import { useParams } from 'next/navigation';
 
 // Relative Dependencies
@@ -17,21 +17,37 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
   const { spaceId } = useParams();
   const { addNodes } = useReactFlow();
 
+  const store = useStoreApi();
   const mutation = useCreateRootMessage();
+
+  const {
+    height,
+    width,
+    transform: [transformX, transformY, zoomLevel],
+  } = store.getState();
+
+  const zoomMultiplier = 1 / zoomLevel;
+
+  // Figure out the center of the current viewport
+  const centerX = -transformX * zoomMultiplier + (width * zoomMultiplier) / 2;
+  const centerY = -transformY * zoomMultiplier + (height * zoomMultiplier) / 2;
+
+  // Add offsets for the height/width of the new node
+  // (Assuming that you don't have to calculate this as well
+  const nodeWidthOffset = 300 / 2;
+  const nodeHeightOffset = 220 / 2;
 
   const onNewRootMessage = async () => {
     const { data } = await mutation.mutateAsync({ spaceId: spaceId as string });
     // TODO: Fix type, response should not be an array
     const { message: messageList } = data;
-
     const message = messageList[0];
 
-    // TODO: need to figure out how to position the node
     const newNode = {
       id: message.id,
       position: {
-        x: 500,
-        y: 500,
+        x: centerX - nodeWidthOffset,
+        y: centerY - nodeHeightOffset,
       },
       data: {
         systemMessage: null,
@@ -43,6 +59,10 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
         toggleScrollMode,
       },
       type: 'messageNode',
+      style: {
+        // TOOD: Figure out how to calculate dynamic zIndex
+        zIndex: 1000,
+      },
     };
 
     addNodes(newNode);
