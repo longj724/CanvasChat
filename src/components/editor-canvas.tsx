@@ -14,6 +14,7 @@ import {
   Position,
   ReactFlow,
   useEdgesState,
+  Node,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useParams } from 'next/navigation';
@@ -24,6 +25,7 @@ import SettingsModal from './modals/settings-modal';
 import { Sidebar } from './sidebar/sidebar';
 import AddMessageButton from './add-message-button';
 import { useGetMessages } from '@/hooks/use-get-messages';
+import { useUpdateMessage } from '@/hooks/use-update-message';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
@@ -32,6 +34,7 @@ const Flow = () => {
   const [isEnteringText, setIsEnteringText] = useState(false);
   const { spaceId } = useParams();
   const messagesQuery = useGetMessages(spaceId as string);
+  const updateMessageMutation = useUpdateMessage();
 
   const initialNodes = useMemo(() => {
     return [
@@ -122,6 +125,16 @@ const Flow = () => {
     }
   }, [messagesQuery.data]);
 
+  const onNodeDragStop = (event: React.MouseEvent, node: Node) => {
+    console.log('Node moved:', node);
+
+    updateMessageMutation.mutate({
+      messageId: node.id,
+      xPosition: node.position.x,
+      yPosition: node.position.y,
+    });
+  };
+
   return (
     <>
       <Sidebar />
@@ -137,6 +150,7 @@ const Flow = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStop={onNodeDragStop}
         // @ts-ignore - not sure why it doesn't like width and height
         nodeTypes={nodeTypes}
         edgesUpdatable={!isScrollMode}

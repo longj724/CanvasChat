@@ -73,6 +73,52 @@ const app = new Hono()
         },
       });
     }
+  )
+  .post(
+    '/update-message',
+    zValidator(
+      'json',
+      z.object({
+        messageId: z.string(),
+        xPosition: z.number().optional(),
+        yPosition: z.number().optional(),
+      })
+    ),
+    async (c) => {
+      const body = c.req.valid('json');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const updateData: Partial<typeof messages.$inferInsert> = {};
+
+      if ('xPosition' in body) {
+        updateData.xPosition = String(body.xPosition);
+      }
+
+      if ('yPosition' in body) {
+        updateData.yPosition = String(body.yPosition);
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        return c.json({ message: 'No updates provided' }, 400);
+      }
+
+      const newMessage = await db
+        .update(messages)
+        .set(updateData)
+        .where(eq(messages.id, body.messageId));
+
+      console.log('newMessage', newMessage);
+
+      return c.json({
+        data: {
+          message: newMessage,
+        },
+      });
+    }
   );
 
 export default app;
