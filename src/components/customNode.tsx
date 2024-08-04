@@ -31,15 +31,9 @@ const selector = (state: ReactFlowState) => ({
   isEnteringText: state.paneDragging,
 });
 
-interface Message {
-  id: number;
-  text: string;
-  sender: 'user' | 'bot';
-}
-
-interface MessageNodeType {
+export interface MessageNodeType {
   id: string;
-  type: 'message-node';
+  type: string;
   position: {
     x: number;
     y: number;
@@ -48,10 +42,9 @@ interface MessageNodeType {
 }
 
 export interface MessageType {
-  systemMessage: string | null;
   userMessage: string | null;
   responseMessage: string | null;
-  pastMessages: Message[];
+  previousMessages: string;
   createdFrom: Position | null;
   toggleScrollMode: Dispatch<SetStateAction<boolean>>;
   togglePanning: Dispatch<SetStateAction<boolean>>;
@@ -74,9 +67,8 @@ const MessageNode = ({
 }) => {
   const {
     createdFrom,
-    pastMessages,
+    previousMessages,
     responseMessage,
-    systemMessage,
     togglePanning,
     toggleScrollMode,
     userMessage,

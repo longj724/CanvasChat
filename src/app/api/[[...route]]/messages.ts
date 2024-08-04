@@ -16,10 +16,12 @@ const app = new Hono()
       'json',
       z.object({
         spaceId: z.string(),
+        xPosition: z.number(),
+        yPosition: z.number(),
       })
     ),
     async (c) => {
-      const { spaceId } = c.req.valid('json');
+      const { spaceId, xPosition, yPosition } = c.req.valid('json');
       const auth = getAuth(c);
 
       if (!auth?.userId) {
@@ -28,7 +30,12 @@ const app = new Hono()
 
       const newMessage = await db
         .insert(messages)
-        .values({ spaceId, modelName: 'gpt-4o' })
+        .values({
+          spaceId,
+          modelName: 'gpt-4o',
+          xPosition: String(xPosition),
+          yPosition: String(yPosition),
+        })
         .returning();
 
       return c.json({
@@ -39,15 +46,10 @@ const app = new Hono()
     }
   )
   .get(
-    '/',
-    zValidator(
-      'json',
-      z.object({
-        spaceId: z.string(),
-      })
-    ),
+    '/:spaceId',
+    zValidator('param', z.object({ spaceId: z.string() })),
     async (c) => {
-      const { spaceId } = c.req.valid('json');
+      const { spaceId } = c.req.valid('param');
       const auth = getAuth(c);
 
       if (!auth?.userId) {

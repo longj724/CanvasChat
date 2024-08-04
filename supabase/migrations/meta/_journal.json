@@ -15,6 +15,20 @@
       "when": 1722483226671,
       "tag": "0001_eager_hercules",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1722702279762,
+      "tag": "0002_aspiring_raza",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1722702687472,
+      "tag": "0003_lame_mathemanic",
+      "breakpoints": true
     }
   ]
 }

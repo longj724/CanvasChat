@@ -38,7 +38,11 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
   const nodeHeightOffset = 220 / 2;
 
   const onNewRootMessage = async () => {
-    const { data } = await mutation.mutateAsync({ spaceId: spaceId as string });
+    const { data } = await mutation.mutateAsync({
+      spaceId: spaceId as string,
+      xPosition: centerX - nodeWidthOffset,
+      yPosition: centerY - nodeHeightOffset,
+    });
     // TODO: Fix type, response should not be an array
     const { message: messageList } = data;
     const message = messageList[0];

@@ -1,5 +1,5 @@
 // External Dependencies
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   addEdge,
   applyEdgeChanges,
@@ -16,18 +16,22 @@ import {
   useEdgesState,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useParams } from 'next/navigation';
 
 // Relative Dependencies
-import MessageNode from './customNode';
+import MessageNode, { MessageNodeType } from './customNode';
 import SettingsModal from './modals/settings-modal';
 import { Sidebar } from './sidebar/sidebar';
 import AddMessageButton from './add-message-button';
+import { useGetMessages } from '@/hooks/use-get-messages';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
 const Flow = () => {
   const [isScrollMode, setIsScrollMode] = useState(false);
   const [isEnteringText, setIsEnteringText] = useState(false);
+  const { spaceId } = useParams();
+  const messagesQuery = useGetMessages(spaceId as string);
 
   const initialNodes = useMemo(() => {
     return [
@@ -36,10 +40,9 @@ const Flow = () => {
         type: 'messageNode',
         position: { x: 0, y: 0 },
         data: {
-          systemMessage: 'System Message',
           userMessage: null,
           responseMessage: 'Response Message',
-          pastMessages: [],
+          previousMessages: '',
           createdFrom: null,
           togglePanning: setIsEnteringText,
           toggleScrollMode: setIsScrollMode,
@@ -51,20 +54,19 @@ const Flow = () => {
         type: 'messageNode',
         position: { x: 0, y: 500 },
         data: {
-          systemMessage: 'System Message',
           userMessage: 'User Message',
           responseMessage: 'Response Message',
-          pastMessages: [],
+          previousMessages: '',
           createdFrom: Position.Top,
           togglePanning: setIsEnteringText,
-          toggleScrollMod: setIsScrollMode,
+          toggleScrollMode: setIsScrollMode,
           scrollModeEnabled: false,
         },
       },
     ];
   }, []);
 
-  const [nodes, setNodes] = useState(initialNodes);
+  const [nodes, setNodes] = useState<MessageNodeType[]>([]);
   const [edges, setEdges] = useEdgesState(initialEdges);
 
   const onNodesChange = useCallback(
@@ -94,6 +96,32 @@ const Flow = () => {
     []
   );
 
+  useEffect(() => {
+    // Turn messages into nodes
+    const nodes: MessageNodeType[] =
+      messagesQuery.data?.messages.map((message) => ({
+        id: message.id,
+        type: 'messageNode',
+        position: {
+          x: Number(message.xPosition),
+          y: Number(message.yPosition),
+        },
+        data: {
+          userMessage: message.userMessage,
+          responseMessage: message.response,
+          previousMessages: message.previousMessageContext ?? '',
+          createdFrom: (message.createdFrom as Position) ?? null,
+          togglePanning: setIsEnteringText,
+          toggleScrollMode: setIsScrollMode,
+          scrollModeEnabled: false,
+        },
+      })) ?? [];
+
+    if (messagesQuery.data) {
+      setNodes(nodes);
+    }
+  }, [messagesQuery.data]);
+
   return (
     <>
       <Sidebar />
@@ -103,6 +131,7 @@ const Flow = () => {
         toggleScrollMode={setIsScrollMode}
       />
       <ReactFlow
+        // @ts-ignore
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
