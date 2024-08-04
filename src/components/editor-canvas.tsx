@@ -113,6 +113,7 @@ const Flow = () => {
           userMessage: message.userMessage,
           responseMessage: message.response,
           previousMessages: message.previousMessageContext ?? '',
+          model: message.modelName,
           createdFrom: (message.createdFrom as Position) ?? null,
           togglePanning: setIsEnteringText,
           toggleScrollMode: setIsScrollMode,
@@ -126,8 +127,6 @@ const Flow = () => {
   }, [messagesQuery.data]);
 
   const onNodeDragStop = (event: React.MouseEvent, node: Node) => {
-    console.log('Node moved:', node);
-
     updateMessageMutation.mutate({
       messageId: node.id,
       xPosition: node.position.x,

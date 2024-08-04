@@ -1,5 +1,11 @@
 // External Dependencies
-import { useCallback, useMemo, Dispatch, SetStateAction } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import {
   Handle,
   Position,
@@ -24,6 +30,15 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ChatInput from './ChatInput';
 import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useUpdateMessage } from '@/hooks/use-update-message';
 
 const selector = (state: ReactFlowState) => ({
   nodes: state.nodes,
@@ -45,6 +60,7 @@ export interface MessageType {
   userMessage: string | null;
   responseMessage: string | null;
   previousMessages: string;
+  model: string;
   createdFrom: Position | null;
   toggleScrollMode: Dispatch<SetStateAction<boolean>>;
   togglePanning: Dispatch<SetStateAction<boolean>>;
@@ -69,15 +85,18 @@ const MessageNode = ({
     createdFrom,
     previousMessages,
     responseMessage,
+    model,
     togglePanning,
     toggleScrollMode,
     userMessage,
   } = data;
 
+  const [selectedModel, setSelectedModel] = useState(model);
+
   const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
   const store = useStoreApi();
-
   const edges = useEdges();
+  const updateMessageMutation = useUpdateMessage();
 
   const hasBottomEdge = useMemo(() => {
     return edges.some((edge) => edge.source === id);
@@ -158,6 +177,14 @@ const MessageNode = ({
     });
   }, [positionAbsoluteX, positionAbsoluteY, setCenter]);
 
+  const handleModelChange = (value: string) => {
+    setSelectedModel(value);
+    updateMessageMutation.mutate({
+      messageId: id,
+      model: value,
+    });
+  };
+
   return (
     <>
       {/* Handles */}
@@ -167,7 +194,42 @@ const MessageNode = ({
 
       <Card className="w-[600px]">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg text-center">Chat Node </CardTitle>
+          <Select value={selectedModel} onValueChange={handleModelChange}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="test" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem
+                  value="gpt-4o"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  gpt-4o{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
+                <SelectItem
+                  value="gpt-4-turbo"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  gpt-4-turbo{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
+                <SelectItem
+                  value="gpt-4-turbo"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  gpt-4-0125-preview{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <div className="flex items-center ml-auto gap-2">
             <Button size={'icon'} className="ml-auto">
               <LocateFixed onClick={handleCenterOnNode} />
@@ -228,6 +290,7 @@ const MessageNode = ({
         </CardContent>
         <CardFooter className="flex-col">
           <Button
+            disabled={!userMessage}
             onClick={handleAddBottomNode}
             size="sm"
             variant="outline"

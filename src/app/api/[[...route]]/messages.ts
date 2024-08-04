@@ -11,6 +11,44 @@ import { eq } from 'drizzle-orm';
 
 const app = new Hono()
   .post(
+    '/create-chained-message',
+    zValidator(
+      'json',
+      z.object({
+        spaceId: z.string(),
+        xPosition: z.number(),
+        yPosition: z.number(),
+        messageId: z.string(),
+        previousMesageContext: z.string(),
+      })
+    ),
+    async (c) => {
+      const { spaceId, xPosition, yPosition, messageId } = c.req.valid('json');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const newMessage = await db
+        .insert(messages)
+        .values({
+          spaceId,
+          modelName: 'gpt-4o',
+          xPosition: String(xPosition),
+          yPosition: String(yPosition),
+          previousMessageContext: messageId,
+        })
+        .returning();
+
+      return c.json({
+        data: {
+          message: newMessage,
+        },
+      });
+    }
+  )
+  .post(
     '/create-root-message',
     zValidator(
       'json',
@@ -82,6 +120,7 @@ const app = new Hono()
         messageId: z.string(),
         xPosition: z.number().optional(),
         yPosition: z.number().optional(),
+        model: z.string().optional(),
       })
     ),
     async (c) => {
@@ -102,6 +141,10 @@ const app = new Hono()
         updateData.yPosition = String(body.yPosition);
       }
 
+      if ('model' in body) {
+        updateData.modelName = body.model;
+      }
+
       if (Object.keys(updateData).length === 0) {
         return c.json({ message: 'No updates provided' }, 400);
       }
@@ -110,8 +153,6 @@ const app = new Hono()
         .update(messages)
         .set(updateData)
         .where(eq(messages.id, body.messageId));
-
-      console.log('newMessage', newMessage);
 
       return c.json({
         data: {
