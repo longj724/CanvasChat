@@ -219,7 +219,7 @@ const MessageNode = ({
                     'No OpenAI API Key Added'} */}
                 </SelectItem>
                 <SelectItem
-                  value="gpt-4-turbo"
+                  value="gpt-4-0125-preview"
                   // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
                 >
