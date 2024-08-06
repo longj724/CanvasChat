@@ -214,6 +214,8 @@ const app = new Hono()
         xPosition: z.number().optional(),
         yPosition: z.number().optional(),
         model: z.string().optional(),
+        userMessage: z.string().optional(),
+        response: z.string().optional(),
       })
     ),
     async (c) => {
@@ -236,6 +238,14 @@ const app = new Hono()
 
       if ('model' in body) {
         updateData.modelName = body.model;
+      }
+
+      if ('userMessage' in body) {
+        updateData.userMessage = body.userMessage;
+      }
+
+      if ('response' in body) {
+        updateData.response = body.response;
       }
 
       if (Object.keys(updateData).length === 0) {

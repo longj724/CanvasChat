@@ -50,8 +50,8 @@ const MessageText = ({ type, content, togglePanning }: Props) => {
         'flex w-full flex-row items-center justify-center py-3',
         type === 'user' ? 'bg-muted/40' : 'bg-muted'
       )}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
+      // onMouseEnter={onEnter}
+      // onMouseLeave={onLeave}
     >
       <div className="flex w-4/5 flex-col ">
         <div className="flex flex-row items-center gap-2 p-2">

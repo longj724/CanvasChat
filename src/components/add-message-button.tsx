@@ -54,11 +54,11 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
         y: centerY - nodeHeightOffset,
       },
       data: {
-        systemMessage: null,
         userMessage: null,
         responseMessage: null,
-        pastMessages: [],
+        previousMessages: '',
         createdFrom: null,
+        model: 'gpt-4o',
         togglePanning,
         toggleScrollMode,
       },

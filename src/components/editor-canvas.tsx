@@ -117,7 +117,6 @@ const Flow = () => {
           createdFrom: (message.createdFrom as Position) ?? null,
           togglePanning: setIsEnteringText,
           toggleScrollMode: setIsScrollMode,
-          scrollModeEnabled: false,
         },
       })) ?? [];
 

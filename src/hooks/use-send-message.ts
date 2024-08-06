@@ -6,6 +6,7 @@ import { InferRequestType } from 'hono';
 
 // Relative Dependencies
 import { client } from '../lib/hono';
+import { useUpdateMessage } from './use-update-message';
 
 type RequestType = InferRequestType<
   (typeof client.api.messages)['send-message']['$post']
@@ -15,6 +16,7 @@ export const useSendMessage = () => {
   const [streamingResponse, setStreamingResponse] = useState<string | null>(
     null
   );
+  const updateMessageMutation = useUpdateMessage();
 
   const mutation = useMutation<string, Error, RequestType>({
     mutationFn: async (json) => {
@@ -40,6 +42,13 @@ export const useSendMessage = () => {
         fullResponse += chunk;
         setStreamingResponse(fullResponse);
       }
+
+      // Update the message in the database
+      updateMessageMutation.mutate({
+        messageId: json.messageId,
+        userMessage: json.userMessage,
+        response: fullResponse,
+      });
 
       return fullResponse;
     },

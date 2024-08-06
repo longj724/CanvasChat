@@ -107,10 +107,9 @@ const MessageNode = ({
         y: positionAbsoluteY + nodeHeight + 100,
       },
       data: {
-        systemMessage: null,
         userMessage: null,
         responseMessage: null,
-        pastMessages: [],
+        previousMessages: [],
         createdFrom: Position.Bottom,
         togglePanning,
         toggleScrollMode,
@@ -137,10 +136,9 @@ const MessageNode = ({
         y: positionAbsoluteY,
       },
       data: {
-        systemMessage: null,
         userMessage: null,
         responseMessage: null,
-        pastMessages: [],
+        previousMessages: [],
         createdFrom: Position.Right,
         togglePanning,
         toggleScrollMode,
@@ -257,10 +255,17 @@ const MessageNode = ({
               togglePanning={togglePanning}
             />
           )}
-          {(userMessage || streamingResponse !== null) && (
+          {streamingResponse !== null && (
             <MessageText
               type="system"
               content={streamingResponse as string}
+              togglePanning={togglePanning}
+            />
+          )}
+          {responseMessage && (
+            <MessageText
+              type="system"
+              content={responseMessage}
               togglePanning={togglePanning}
             />
           )}

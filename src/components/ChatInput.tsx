@@ -49,7 +49,6 @@ const ChatInput = ({
   const [isGenerating, setIsGenerating] = useState(false);
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (text: string) => {
     setUserInput(text);
@@ -68,7 +67,7 @@ const ChatInput = ({
     togglePanning((prev) => !prev);
   };
 
-  const onLeave = (event: React.MouseEvent<HTMLDivElement>) => {
+  const onLeave = () => {
     store.setState({
       nodesDraggable: true,
     });
@@ -85,18 +84,15 @@ const ChatInput = ({
         previousMessageContext === '' ? '{}' : previousMessageContext,
     });
 
-    if (isLoading) {
-      return;
-    }
-
-    store.setState({
-      nodesDraggable: true,
-    });
-
-    // setIsGenerating(true);
+    onLeave();
   };
 
-  console.log('response is:', streamingResponse);
+  const handleKeyPress = (e: React.KeyboardEvent<Element>) => {
+    if (e.key === 'Enter' && e.shiftKey === false) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   return (
     <div
@@ -114,7 +110,7 @@ const ChatInput = ({
           value={userInput}
           minRows={1}
           maxRows={18}
-          // onKeyDown={handleKeyPress}
+          onKeyDown={handleKeyPress}
           onPaste={() => {}}
           onCompositionStart={() => setIsTyping(true)}
           onCompositionEnd={() => setIsTyping(false)}
