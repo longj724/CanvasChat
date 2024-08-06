@@ -3,13 +3,106 @@ import { z } from 'zod';
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { getAuth } from '@hono/clerk-auth';
+import { encode } from 'gpt-tokenizer';
+import { CoreMessage, streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 // Relative Dependencies
 import { db } from '@/db';
-import { edges, messages } from '@/db/schema';
+import { edges, messages, models } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 const app = new Hono()
+  .post(
+    '/send-message',
+    zValidator(
+      'json',
+      z.object({
+        messageId: z.string(),
+        userMessage: z.string(),
+        model: z.string(),
+        previousMessageContext: z.string(),
+      })
+    ),
+    async (c) => {
+      const { messageId, userMessage, model, previousMessageContext } =
+        c.req.valid('json');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const previousMessages: CoreMessage[] = JSON.parse(
+        previousMessageContext
+      );
+
+      // TODO: Get api key from user profile. Will grab from openai env for now
+      const apiKey = process.env.OPENAI_API_KEY;
+
+      const modelRow = await db
+        .select()
+        .from(models)
+        .where(eq(models.name, model));
+
+      if (!modelRow.length) {
+        if (!auth?.userId) {
+          return c.json(
+            { error: "Couldn't connect to model to send message" },
+            401
+          );
+        }
+      }
+
+      const tokenLimit = modelRow[0].contextWindow;
+      let tokensUsed = 0;
+
+      const newMessageTokens = encode(userMessage).length;
+      tokensUsed += newMessageTokens;
+
+      if (tokensUsed > tokenLimit) {
+        return c.json({ error: 'Message is too long' }, 400);
+      }
+
+      const newMessage: CoreMessage = {
+        role: 'user',
+        content: userMessage,
+      };
+
+      let allMessages: CoreMessage[] = [];
+
+      let curMessageIndex = previousMessages.length - 1;
+      while (
+        tokensUsed < tokenLimit &&
+        previousMessages &&
+        curMessageIndex >= 0
+        // && !chat?.exclude_prior_messages
+      ) {
+        const nextMessage = previousMessages[curMessageIndex];
+        const nextMessageTokens = encode(nextMessage.content as string).length;
+
+        tokensUsed += nextMessageTokens;
+
+        if (tokensUsed > tokenLimit) {
+          break;
+        }
+
+        allMessages.unshift(nextMessage);
+
+        curMessageIndex--;
+      }
+
+      // Put new message at the end
+      allMessages.push(newMessage);
+
+      const result = await streamText({
+        model: openai(model),
+        messages: allMessages,
+      });
+
+      return result.toTextStreamResponse();
+    }
+  )
   .post(
     '/create-chained-message',
     zValidator(

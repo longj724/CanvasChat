@@ -9,25 +9,20 @@ import {
 import {
   Handle,
   Position,
-  ReactFlowState,
   useEdges,
   useReactFlow,
-  useStore,
   useStoreApi,
 } from '@xyflow/react';
 import { LocateFixed, PlusCircle, Scroll, Trash } from 'lucide-react';
 
 // Relative Dependencies
-import CustomPlusHandle from './customHandle';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import ChatInput from './ChatInput';
 import { cn } from '@/lib/utils';
 import {
@@ -39,12 +34,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useUpdateMessage } from '@/hooks/use-update-message';
-
-const selector = (state: ReactFlowState) => ({
-  nodes: state.nodes,
-  setNodes: state.setNodes,
-  isEnteringText: state.paneDragging,
-});
+import MessageText from './MessageText';
+import { useSendMessage } from '@/hooks/use-send-message';
 
 export interface MessageNodeType {
   id: string;
@@ -91,12 +82,15 @@ const MessageNode = ({
     userMessage,
   } = data;
 
+  const [userInput, setUserInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(model);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
   const store = useStoreApi();
   const edges = useEdges();
   const updateMessageMutation = useUpdateMessage();
+  const { sendMessage, isLoading, streamingResponse } = useSendMessage();
 
   const hasBottomEdge = useMemo(() => {
     return edges.some((edge) => edge.source === id);
@@ -249,48 +243,45 @@ const MessageNode = ({
           </div>
         </CardHeader>
         <CardContent>
-          {/* <ScrollArea className="h-[200px] w-full pr-4">
-            {pastMessages.map((message) => (
-              <div
-                key={message.id}
-                className={`mb-2 flex ${
-                  message.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                <div
-                  className={`max-w-[80%] p-2 rounded-lg text-sm ${
-                    message.sender === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-800'
-                  }`}
-                >
-                  {message.text}
-                </div>
-              </div>
-            ))}
-          </ScrollArea> */}
-          {/* <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              // handleSendMessage();
-            }}
-            className="flex w-full space-x-2"
-          >
-            <Input
-              placeholder="Type a message..."
-              // value={inputMessage}
-              // onChange={(e) => setInputMessage(e.target.value)}
-              className="text-sm"
+          {userMessage && (
+            <MessageText
+              type="user"
+              content={userMessage as string}
+              togglePanning={togglePanning}
             />
-            <Button type="submit" size="sm">
-              Send
-            </Button>
-          </form> */}
-          {!userMessage && <ChatInput togglePanning={togglePanning} />}
+          )}
+          {isSendingMessage && (
+            <MessageText
+              type="user"
+              content={userInput}
+              togglePanning={togglePanning}
+            />
+          )}
+          {(userMessage || streamingResponse !== null) && (
+            <MessageText
+              type="system"
+              content={streamingResponse as string}
+              togglePanning={togglePanning}
+            />
+          )}
+          {!userMessage && !isSendingMessage && (
+            <ChatInput
+              userInput={userInput}
+              setUserInput={setUserInput}
+              isLoading={isLoading}
+              messageId={id}
+              model={model}
+              previousMessageContext={previousMessages}
+              sendMessage={sendMessage}
+              setIsSendingMessage={setIsSendingMessage}
+              streamingResponse={streamingResponse}
+              togglePanning={togglePanning}
+            />
+          )}
         </CardContent>
         <CardFooter className="flex-col">
           <Button
-            disabled={!userMessage}
+            disabled={!userMessage && !isSendingMessage}
             onClick={handleAddBottomNode}
             size="sm"
             variant="outline"
