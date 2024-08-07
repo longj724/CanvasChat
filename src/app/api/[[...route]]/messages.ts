@@ -11,7 +11,6 @@ import { openai } from '@ai-sdk/openai';
 import { db } from '@/db';
 import { edges, messages, models } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { positionsEnum } from '@/db/schema';
 
 const app = new Hono()
   .post(
@@ -320,6 +319,28 @@ const app = new Hono()
       return c.json({
         data: {
           message: newMessage,
+        },
+      });
+    }
+  )
+  .delete(
+    '/:messageId',
+    zValidator('param', z.object({ messageId: z.string() })),
+    async (c) => {
+      const { messageId } = c.req.valid('param');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const message = await db
+        .delete(messages)
+        .where(eq(messages.id, messageId));
+
+      return c.json({
+        data: {
+          message: message,
         },
       });
     }

@@ -16,5 +16,6 @@ const routes = app.route('/spaces', spaces).route('/messages', messages);
 
 export const GET = handle(app);
 export const POST = handle(app);
+export const DELETE = handle(app);
 
 export type AppType = typeof routes;

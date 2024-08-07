@@ -38,6 +38,7 @@ import MessageText from './MessageText';
 import { useSendMessage } from '@/hooks/use-send-message';
 import { useCreateChildMessage } from '@/hooks/use-create-child-message';
 import { WithTooltip } from '@/components/ui/with-tooltip';
+import { useDeleteMessage } from '@/hooks/use-delete-message';
 
 export interface MessageNodeType {
   id: string;
@@ -96,6 +97,7 @@ const MessageNode = ({
   const updateMessageMutation = useUpdateMessage();
   const { sendMessage, isLoading, streamingResponse } = useSendMessage();
   const createChildMessageMutation = useCreateChildMessage();
+  const deleteMessageMutation = useDeleteMessage(spaceId);
 
   const hasBottomEdge = useMemo(() => {
     return edges.some((edge) => edge.source === id);
@@ -197,6 +199,7 @@ const MessageNode = ({
 
   const handleDeleteNode = useCallback(() => {
     deleteElements({ nodes: [{ id }] });
+    deleteMessageMutation.mutate({ messageId: id });
   }, [id, deleteElements]);
 
   const handleCenterOnNode = useCallback(() => {
@@ -292,7 +295,7 @@ const MessageNode = ({
             />
             <WithTooltip
               delayDuration={200}
-              display={<p>Delete Node</p>}
+              display={<p>Delete Message</p>}
               side="top"
               trigger={
                 <Button size={'icon'} className="ml-auto">
