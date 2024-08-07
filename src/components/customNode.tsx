@@ -222,7 +222,11 @@ const MessageNode = ({
 
       <Card className="w-[600px]">
         <CardHeader className="flex flex-row items-center justify-between">
-          <Select value={selectedModel} onValueChange={handleModelChange}>
+          <Select
+            value={selectedModel}
+            onValueChange={handleModelChange}
+            disabled={userMessage !== null || isSendingMessage}
+          >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder={model} />
             </SelectTrigger>
@@ -279,30 +283,34 @@ const MessageNode = ({
         <CardContent>
           {userMessage && (
             <MessageText
-              type="user"
               content={userMessage as string}
+              model={model}
               togglePanning={togglePanning}
+              type="user"
             />
           )}
           {isSendingMessage && (
             <MessageText
-              type="user"
               content={userInput}
+              model={model}
               togglePanning={togglePanning}
+              type="user"
             />
           )}
           {streamingResponse !== null && (
             <MessageText
-              type="system"
               content={streamingResponse as string}
+              model={model}
               togglePanning={togglePanning}
+              type="system"
             />
           )}
           {responseMessage && (
             <MessageText
-              type="system"
               content={responseMessage}
+              model={model}
               togglePanning={togglePanning}
+              type="system"
             />
           )}
           {!userMessage && !isSendingMessage && (

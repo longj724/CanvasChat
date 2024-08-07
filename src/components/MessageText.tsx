@@ -15,11 +15,12 @@ import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 
 type Props = {
   content: string;
+  model: string;
   togglePanning: Dispatch<SetStateAction<boolean>>;
   type: 'user' | 'system';
 };
 
-const MessageText = ({ type, content, togglePanning }: Props) => {
+const MessageText = ({ content, model, togglePanning, type }: Props) => {
   const store = useStoreApi();
   const { user } = useUser();
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
@@ -29,7 +30,21 @@ const MessageText = ({ type, content, togglePanning }: Props) => {
     copyToClipboard(content);
   };
 
-  // TODO: Get this working
+  const getModelLogo = () => {
+    if (
+      model === 'gpt-4-0125-preview' ||
+      model === 'gpt-4-turbo' ||
+      model === 'gpt-4o'
+    ) {
+      return 'https://utfs.io/f/011ccb66-ae35-4419-b2fd-51ef9175f637-mj83aa.png';
+    } else if (model === 'Mixtral 8x7b') {
+      return 'https://utfs.io/f/03683c6c-b30c-4f90-8e22-7b7335e6bd09-frsh8w.png';
+    } else {
+      return 'https://utfs.io/f/5d86278f-f1a9-470f-8613-fe8dc1d102a0-q2n0kg.jpeg';
+    }
+  };
+
+  // TODO: Get this workingmes
   const onEnter = (event: React.MouseEvent<HTMLDivElement>) => {
     store.setState({
       nodesDraggable: false,
@@ -53,18 +68,16 @@ const MessageText = ({ type, content, togglePanning }: Props) => {
       // onMouseEnter={onEnter}
       // onMouseLeave={onLeave}
     >
-      <div className="flex w-4/5 flex-col ">
-        <div className="flex flex-row items-center gap-2 p-2">
-          {/* <Image
+      <div className="flex w-11/12 flex-col ">
+        <div className="flex flex-row items-center gap-2 py-2 px-1">
+          <Image
             src={type === 'user' ? user?.imageUrl ?? '' : getModelLogo()}
             width={30}
             height={30}
             alt="Model Logo"
             className="rounded-full"
-          /> */}
-          <h2 className="font-semibold">
-            {type === 'user' ? 'You' : '[MODEL_NAME]'}
-          </h2>
+          />
+          <h2 className="font-semibold">{type === 'user' ? 'You' : model}</h2>
           <div className="ml-auto flex flex-row">
             <WithTooltip
               delayDuration={200}
