@@ -85,8 +85,6 @@ const MessageNode = ({
     userMessage,
   } = data;
 
-  console.log('model is', model);
-
   const [userInput, setUserInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(model);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
@@ -115,10 +113,13 @@ const MessageNode = ({
       role: 'system',
       content: responseMessage === null ? streamingResponse : responseMessage,
     };
-    const newPreviousMessageContext =
-      previousMessages +
-      JSON.stringify(newUserMessage) +
-      JSON.stringify(newSystemMessage);
+
+    const previousMessagesAsArray =
+      previousMessages === '' ? [] : JSON.parse(previousMessages);
+    previousMessagesAsArray.push(newUserMessage);
+    previousMessagesAsArray.push(newSystemMessage);
+
+    const newPreviousMessageContext = JSON.stringify(previousMessagesAsArray);
 
     const { data } = await createChildMessageMutation.mutateAsync({
       createdFrom: Position.Bottom,

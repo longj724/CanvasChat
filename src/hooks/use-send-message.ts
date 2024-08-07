@@ -25,7 +25,7 @@ export const useSendMessage = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        throw new Error();
       }
 
       const reader = response.body?.getReader();
@@ -53,7 +53,7 @@ export const useSendMessage = () => {
       return fullResponse;
     },
     onError: (error) => {
-      toast.error(`Failed to send message: ${error.message}`);
+      toast.error('Failed to send message');
     },
   });
 
