@@ -11,6 +11,7 @@ import { openai } from '@ai-sdk/openai';
 import { db } from '@/db';
 import { edges, messages, models } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { positionsEnum } from '@/db/schema';
 
 const app = new Hono()
   .post(
@@ -172,6 +173,65 @@ const app = new Hono()
       return c.json({
         data: {
           message: newMessage,
+        },
+      });
+    }
+  )
+  .post(
+    '/create-child-message',
+    zValidator(
+      'json',
+      z.object({
+        createdFrom: z.enum(['top', 'bottom', 'left', 'right']),
+        model: z.string(),
+        parentMessageId: z.string(),
+        previousMessageContext: z.string(),
+        spaceId: z.string(),
+        xPosition: z.number(),
+        yPosition: z.number(),
+      })
+    ),
+    async (c) => {
+      const {
+        createdFrom,
+        model,
+        parentMessageId,
+        previousMessageContext,
+        spaceId,
+        xPosition,
+        yPosition,
+      } = c.req.valid('json');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const newMessage = await db
+        .insert(messages)
+        .values({
+          createdFrom: createdFrom,
+          modelName: model,
+          previousMessageContext: previousMessageContext,
+          spaceId,
+          xPosition: String(xPosition),
+          yPosition: String(yPosition),
+        })
+        .returning();
+
+      const newEdge = await db
+        .insert(edges)
+        .values({
+          spaceId,
+          sourceId: parentMessageId,
+          targetId: newMessage[0].id,
+        })
+        .returning();
+
+      return c.json({
+        data: {
+          message: newMessage,
+          edge: newEdge,
         },
       });
     }

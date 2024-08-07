@@ -36,6 +36,7 @@ import {
 import { useUpdateMessage } from '@/hooks/use-update-message';
 import MessageText from './MessageText';
 import { useSendMessage } from '@/hooks/use-send-message';
+import { useCreateChildMessage } from '@/hooks/use-create-child-message';
 
 export interface MessageNodeType {
   id: string;
@@ -48,13 +49,14 @@ export interface MessageNodeType {
 }
 
 export interface MessageType {
-  userMessage: string | null;
-  responseMessage: string | null;
-  previousMessages: string;
-  model: string;
   createdFrom: Position | null;
-  toggleScrollMode: Dispatch<SetStateAction<boolean>>;
+  model: string;
+  previousMessages: string;
+  responseMessage: string | null;
+  spaceId: string;
   togglePanning: Dispatch<SetStateAction<boolean>>;
+  toggleScrollMode: Dispatch<SetStateAction<boolean>>;
+  userMessage: string | null;
 }
 
 const MessageNode = ({
@@ -77,10 +79,13 @@ const MessageNode = ({
     previousMessages,
     responseMessage,
     model,
+    spaceId,
     togglePanning,
     toggleScrollMode,
     userMessage,
   } = data;
+
+  console.log('model is', model);
 
   const [userInput, setUserInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(model);
@@ -91,36 +96,65 @@ const MessageNode = ({
   const edges = useEdges();
   const updateMessageMutation = useUpdateMessage();
   const { sendMessage, isLoading, streamingResponse } = useSendMessage();
+  const createChildMessageMutation = useCreateChildMessage();
 
   const hasBottomEdge = useMemo(() => {
     return edges.some((edge) => edge.source === id);
   }, [id, edges]);
 
-  const handleAddBottomNode = useCallback(() => {
-    const newNodeId = `${id}-child-${Date.now()}`;
+  const handleAddBottomNode = useCallback(async () => {
     // TODO: Fix height bug where height is 0 before the node is interacted with
     const nodeHeight = height === 0 ? 420 : height;
+
+    const newUserMessage = {
+      role: 'user',
+      content: userMessage,
+    };
+
+    const newSystemMessage = {
+      role: 'system',
+      content: responseMessage === null ? streamingResponse : responseMessage,
+    };
+    const newPreviousMessageContext =
+      previousMessages +
+      JSON.stringify(newUserMessage) +
+      JSON.stringify(newSystemMessage);
+
+    const { data } = await createChildMessageMutation.mutateAsync({
+      createdFrom: Position.Bottom,
+      model,
+      parentMessageId: id,
+      previousMessageContext: newPreviousMessageContext,
+      spaceId,
+      xPosition: positionAbsoluteX,
+      yPosition: positionAbsoluteY + nodeHeight + 100,
+    });
+
+    const { message, edge } = data;
+
     const newNode = {
-      id: newNodeId,
+      id: message[0].id,
       position: {
         x: positionAbsoluteX,
         y: positionAbsoluteY + nodeHeight + 100,
       },
       data: {
-        userMessage: null,
-        responseMessage: null,
-        previousMessages: [],
         createdFrom: Position.Bottom,
+        model,
+        previousMessages: [],
+        responseMessage: null,
+        spaceId,
         togglePanning,
         toggleScrollMode,
+        userMessage: null,
       },
       type: 'messageNode',
     };
 
     const newEdge = {
-      id: `${id}-${newNodeId}`,
+      id: edge[0].id,
       source: id,
-      target: newNodeId,
+      target: message[0].id,
     };
 
     addNodes(newNode);
@@ -136,12 +170,13 @@ const MessageNode = ({
         y: positionAbsoluteY,
       },
       data: {
-        userMessage: null,
-        responseMessage: null,
-        previousMessages: [],
         createdFrom: Position.Right,
+        previousMessages: [],
+        responseMessage: null,
+        spaceId,
         togglePanning,
         toggleScrollMode,
+        userMessage: null,
       },
       type: 'messageNode',
     };
@@ -188,7 +223,7 @@ const MessageNode = ({
         <CardHeader className="flex flex-row items-center justify-between">
           <Select value={selectedModel} onValueChange={handleModelChange}>
             <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="test" />
+              <SelectValue placeholder={model} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>

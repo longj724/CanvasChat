@@ -32,45 +32,12 @@ const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 const Flow = () => {
   const [isScrollMode, setIsScrollMode] = useState(false);
   const [isEnteringText, setIsEnteringText] = useState(false);
+  const [nodes, setNodes] = useState<MessageNodeType[]>([]);
+  const [edges, setEdges] = useEdgesState(initialEdges);
+
   const { spaceId } = useParams();
   const messagesQuery = useGetMessages(spaceId as string);
   const updateMessageMutation = useUpdateMessage();
-
-  const initialNodes = useMemo(() => {
-    return [
-      {
-        id: '1',
-        type: 'messageNode',
-        position: { x: 0, y: 0 },
-        data: {
-          userMessage: null,
-          responseMessage: 'Response Message',
-          previousMessages: '',
-          createdFrom: null,
-          togglePanning: setIsEnteringText,
-          toggleScrollMode: setIsScrollMode,
-          scrollModeEnabled: false,
-        },
-      },
-      {
-        id: '2',
-        type: 'messageNode',
-        position: { x: 0, y: 500 },
-        data: {
-          userMessage: 'User Message',
-          responseMessage: 'Response Message',
-          previousMessages: '',
-          createdFrom: Position.Top,
-          togglePanning: setIsEnteringText,
-          toggleScrollMode: setIsScrollMode,
-          scrollModeEnabled: false,
-        },
-      },
-    ];
-  }, []);
-
-  const [nodes, setNodes] = useState<MessageNodeType[]>([]);
-  const [edges, setEdges] = useEdgesState(initialEdges);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -110,18 +77,30 @@ const Flow = () => {
           y: Number(message.yPosition),
         },
         data: {
-          userMessage: message.userMessage,
-          responseMessage: message.response,
-          previousMessages: message.previousMessageContext ?? '',
-          model: message.modelName,
           createdFrom: (message.createdFrom as Position) ?? null,
+          model: message.modelName,
+          previousMessages: message.previousMessageContext ?? '',
+          responseMessage: message.response,
+          spaceId: message.spaceId,
           togglePanning: setIsEnteringText,
           toggleScrollMode: setIsScrollMode,
+          userMessage: message.userMessage,
         },
       })) ?? [];
 
     if (messagesQuery.data) {
       setNodes(nodes);
+    }
+
+    const edges =
+      messagesQuery.data?.edges.map((edge) => ({
+        id: edge.id,
+        source: edge.sourceId as string,
+        target: edge.targetId as string,
+      })) ?? [];
+
+    if (edges) {
+      setEdges(edges);
     }
   }, [messagesQuery.data]);
 
