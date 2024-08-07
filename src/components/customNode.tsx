@@ -37,6 +37,7 @@ import { useUpdateMessage } from '@/hooks/use-update-message';
 import MessageText from './MessageText';
 import { useSendMessage } from '@/hooks/use-send-message';
 import { useCreateChildMessage } from '@/hooks/use-create-child-message';
+import { WithTooltip } from '@/components/ui/with-tooltip';
 
 export interface MessageNodeType {
   id: string;
@@ -263,21 +264,42 @@ const MessageNode = ({
             </SelectContent>
           </Select>
           <div className="flex items-center ml-auto gap-2">
-            <Button size={'icon'} className="ml-auto">
-              <LocateFixed onClick={handleCenterOnNode} />
-            </Button>
-            <Button
-              size={'icon'}
-              className={cn(
-                'ml-auto',
-                !store.getState().nodesDraggable && 'bg-red-500'
-              )}
-            >
-              <Scroll onClick={() => toggleScrollMode((prev) => !prev)} />
-            </Button>
-            <Button size={'icon'} className="ml-auto">
-              <Trash onClick={handleDeleteNode} />
-            </Button>
+            <WithTooltip
+              delayDuration={200}
+              display={<p>Center On Node</p>}
+              side="top"
+              trigger={
+                <Button size={'icon'} className="ml-auto">
+                  <LocateFixed onClick={handleCenterOnNode} />
+                </Button>
+              }
+            />
+            <WithTooltip
+              delayDuration={200}
+              display={<p>Toggle Scroll Mode</p>}
+              side="top"
+              trigger={
+                <Button
+                  size={'icon'}
+                  className={cn(
+                    'ml-auto',
+                    !store.getState().nodesDraggable && 'bg-red-500'
+                  )}
+                >
+                  <Scroll onClick={() => toggleScrollMode((prev) => !prev)} />
+                </Button>
+              }
+            />
+            <WithTooltip
+              delayDuration={200}
+              display={<p>Delete Node</p>}
+              side="top"
+              trigger={
+                <Button size={'icon'} className="ml-auto">
+                  <Trash onClick={handleDeleteNode} />
+                </Button>
+              }
+            />
           </div>
         </CardHeader>
         <CardContent>
