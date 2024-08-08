@@ -1,0 +1,1 @@
+ALTER TABLE "message" ADD COLUMN "width" numeric DEFAULT '420' NOT NULL;

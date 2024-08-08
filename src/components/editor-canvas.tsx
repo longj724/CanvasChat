@@ -85,6 +85,7 @@ const Flow = () => {
           togglePanning: setIsEnteringText,
           toggleScrollMode: setIsScrollMode,
           userMessage: message.userMessage,
+          width: Number(message.width),
         },
       })) ?? [];
 

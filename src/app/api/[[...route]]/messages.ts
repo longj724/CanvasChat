@@ -275,6 +275,7 @@ const app = new Hono()
         model: z.string().optional(),
         userMessage: z.string().optional(),
         response: z.string().optional(),
+        width: z.number().optional(),
       })
     ),
     async (c) => {
@@ -305,6 +306,10 @@ const app = new Hono()
 
       if ('response' in body) {
         updateData.response = body.response;
+      }
+
+      if ('width' in body) {
+        updateData.width = String(body.width);
       }
 
       if (Object.keys(updateData).length === 0) {

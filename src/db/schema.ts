@@ -47,6 +47,7 @@ export const messages = pgTable('message', {
   yPosition: numeric('y_position').notNull(),
   createdFrom: positionsEnum('created_from'),
   previousMessageContext: text('previous_message_context'),
+  width: numeric('width').default('420').notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
 });

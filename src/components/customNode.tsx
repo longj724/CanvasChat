@@ -70,6 +70,7 @@ export interface MessageType {
   togglePanning: Dispatch<SetStateAction<boolean>>;
   toggleScrollMode: Dispatch<SetStateAction<boolean>>;
   userMessage: string | null;
+  width: number;
 }
 
 const MessageNode = ({
@@ -78,14 +79,12 @@ const MessageNode = ({
   id,
   positionAbsoluteX,
   positionAbsoluteY,
-  width: initialWidth,
 }: {
   data: MessageType;
   height: number;
   id: string;
   positionAbsoluteX: number;
   positionAbsoluteY: number;
-  width: number;
 }) => {
   const {
     createdFrom,
@@ -96,6 +95,7 @@ const MessageNode = ({
     togglePanning,
     toggleScrollMode,
     userMessage,
+    width: initialWidth,
   } = data;
 
   const [userInput, setUserInput] = useState('');
@@ -238,14 +238,18 @@ const MessageNode = ({
   };
 
   const debouncedSave = useRef(
-    _.debounce((messageId: string, newWidth: number) => {
-      console.log('debouncedSave', messageId, newWidth);
+    _.debounce((newWidth: number) => {
+      console.log('debouncedSave', newWidth);
+      updateMessageMutation.mutate({
+        messageId: id,
+        width: newWidth,
+      });
     }, 500)
   ).current;
 
   useEffect(() => {
     if (width !== initialWidth) {
-      debouncedSave(id, width);
+      debouncedSave(width);
     }
   }, [width]);
 
@@ -281,7 +285,7 @@ const MessageNode = ({
         </div>
       </NodeResizeControl>
 
-      <Card className="">
+      <Card style={{ width: `${width}px` }}>
         <CardHeader className="flex flex-row items-center justify-between">
           <Select
             value={selectedModel}
