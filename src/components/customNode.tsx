@@ -3,17 +3,28 @@ import {
   Dispatch,
   SetStateAction,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import {
   Handle,
+  NodeResizeControl,
   Position,
+  ResizeDragEvent,
   useEdges,
   useReactFlow,
   useStoreApi,
 } from '@xyflow/react';
-import { LocateFixed, PlusCircle, Scroll, Trash } from 'lucide-react';
+import {
+  LocateFixed,
+  Maximize2,
+  PlusCircle,
+  Scroll,
+  Trash,
+} from 'lucide-react';
+import _ from 'lodash';
 
 // Relative Dependencies
 import {
@@ -67,7 +78,7 @@ const MessageNode = ({
   id,
   positionAbsoluteX,
   positionAbsoluteY,
-  width,
+  width: initialWidth,
 }: {
   data: MessageType;
   height: number;
@@ -90,6 +101,7 @@ const MessageNode = ({
   const [userInput, setUserInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(model);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [width, setWidth] = useState(initialWidth);
 
   const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
   const store = useStoreApi();
@@ -98,6 +110,10 @@ const MessageNode = ({
   const { sendMessage, isLoading, streamingResponse } = useSendMessage();
   const createChildMessageMutation = useCreateChildMessage();
   const deleteMessageMutation = useDeleteMessage(spaceId);
+
+  useEffect(() => {
+    setWidth(initialWidth);
+  }, [initialWidth]);
 
   const hasBottomEdge = useMemo(() => {
     return edges.some((edge) => edge.source === id);
@@ -217,14 +233,55 @@ const MessageNode = ({
     });
   };
 
+  const onResize = (resizeDragEvent: ResizeDragEvent) => {
+    setWidth((prev) => prev + resizeDragEvent.dx);
+  };
+
+  const debouncedSave = useRef(
+    _.debounce((messageId: string, newWidth: number) => {
+      console.log('debouncedSave', messageId, newWidth);
+    }, 500)
+  ).current;
+
+  useEffect(() => {
+    if (width !== initialWidth) {
+      debouncedSave(id, width);
+    }
+  }, [width]);
+
   return (
     <>
-      {/* Handles */}
       {createdFrom !== null && <Handle type="target" position={Position.Top} />}
       <Handle type="target" position={Position.Bottom} id="bottom" />
       <Handle type="source" position={Position.Bottom} id="bottom" />
 
-      <Card className="w-[600px]">
+      <NodeResizeControl
+        className="border-none bg-transparent"
+        minWidth={400}
+        minHeight={420}
+        position="right"
+        onResize={onResize}
+      >
+        <div
+          className="absolute top-[50%] bg-white p-2 z-[1000]"
+          style={{
+            right: -20,
+            transform: 'translateY(-50%)',
+            cursor: 'col-resize',
+            border: '1px solid #999',
+            borderRadius: '50%',
+          }}
+        >
+          <Maximize2
+            size={16}
+            style={{
+              transform: 'rotate(45deg)',
+            }}
+          />
+        </div>
+      </NodeResizeControl>
+
+      <Card className="">
         <CardHeader className="flex flex-row items-center justify-between">
           <Select
             value={selectedModel}
