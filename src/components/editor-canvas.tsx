@@ -87,6 +87,9 @@ const Flow = () => {
           userMessage: message.userMessage,
           width: Number(message.width),
         },
+        style: {
+          width: Number(message.width),
+        },
       })) ?? [];
 
     if (messagesQuery.data) {

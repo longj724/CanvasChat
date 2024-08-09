@@ -239,10 +239,9 @@ const MessageNode = ({
 
   const debouncedSave = useRef(
     _.debounce((newWidth: number) => {
-      console.log('debouncedSave', newWidth);
       updateMessageMutation.mutate({
         messageId: id,
-        width: newWidth,
+        width: Math.max(newWidth, 420),
       });
     }, 500)
   ).current;
@@ -285,7 +284,7 @@ const MessageNode = ({
         </div>
       </NodeResizeControl>
 
-      <Card style={{ width: `${width}px` }}>
+      <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <Select
             value={selectedModel}
