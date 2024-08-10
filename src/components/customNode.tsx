@@ -339,22 +339,6 @@ const MessageNode = ({
             />
             <WithTooltip
               delayDuration={200}
-              display={<p>Toggle Scroll Mode</p>}
-              side="top"
-              trigger={
-                <Button
-                  size={'icon'}
-                  className={cn(
-                    'ml-auto',
-                    !store.getState().nodesDraggable && 'bg-red-500'
-                  )}
-                >
-                  <Scroll onClick={() => toggleScrollMode((prev) => !prev)} />
-                </Button>
-              }
-            />
-            <WithTooltip
-              delayDuration={200}
               display={<p>Delete Message</p>}
               side="top"
               trigger={

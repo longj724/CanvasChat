@@ -26,6 +26,7 @@ import { Sidebar } from './sidebar/sidebar';
 import AddMessageButton from './add-message-button';
 import { useGetMessages } from '@/hooks/use-get-messages';
 import { useUpdateMessage } from '@/hooks/use-update-message';
+import ScrollModeButton from './scroll-mode-button';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
@@ -124,6 +125,7 @@ const Flow = () => {
         togglePanning={setIsEnteringText}
         toggleScrollMode={setIsScrollMode}
       />
+      <ScrollModeButton toggleScrollMode={setIsScrollMode} />
       <ReactFlow
         // @ts-ignore
         nodes={nodes}
