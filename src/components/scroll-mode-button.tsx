@@ -28,18 +28,19 @@ const ScrollModeButton = ({ toggleScrollMode }: Props) => {
     <div className="absolute right-[12px] top-[135px] hover:cursor-pointer z-50">
       <WithTooltip
         delayDuration={200}
-        display={<p>Toggle Scroll Mode</p>}
+        display={<p>Enable Scroll Mode</p>}
         side="left"
         trigger={
-          <Button
-            size={'icon'}
+          <Scroll
+            size={32}
+            color="white"
+            onClick={onToggleScrollMode}
             className={cn(
-              'ml-auto',
-              !store.getState().nodesDraggable && 'bg-red-500'
+              'ml-auto bg-gray-600 p-2 rounded-lg hover:bg-gray-700',
+              !store.getState().nodesDraggable &&
+                'bg-gray-700 hover:bg-gray-600'
             )}
-          >
-            <Scroll onClick={onToggleScrollMode} />
-          </Button>
+          />
         }
       />
     </div>
