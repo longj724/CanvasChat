@@ -282,6 +282,15 @@ const MessageNode = ({
             }}
           />
         </div>
+        <div
+          className="absolute top-[50%] p-2 z-[1000]"
+          style={{
+            right: -10,
+            transform: 'translateY(-50%)',
+            cursor: 'col-resize',
+            height: `${height}px`,
+          }}
+        />
       </NodeResizeControl>
 
       <Card>
