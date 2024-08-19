@@ -61,6 +61,7 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
         model: 'gpt-4o',
         togglePanning,
         toggleScrollMode,
+        spaceId,
       },
       type: 'messageNode',
       style: {

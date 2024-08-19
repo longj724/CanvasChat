@@ -12,6 +12,7 @@
     "db:studio": "npx drizzle-kit studio"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^0.0.43",
     "@ai-sdk/openai": "^0.0.40",
     "@clerk/backend": "^1.4.3",
     "@clerk/nextjs": "^5.2.8",

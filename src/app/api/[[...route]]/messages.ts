@@ -5,12 +5,13 @@ import { zValidator } from '@hono/zod-validator';
 import { getAuth } from '@hono/clerk-auth';
 import { encode } from 'gpt-tokenizer';
 import { CoreMessage, streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+// import { openai } from '@ai-sdk/openai';
+import { eq } from 'drizzle-orm';
 
 // Relative Dependencies
 import { db } from '@/db';
 import { edges, messages, models } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { modelNameToProvider } from '@/lib/utils';
 
 const app = new Hono()
   .post(
@@ -36,9 +37,6 @@ const app = new Hono()
       const previousMessages: CoreMessage[] = JSON.parse(
         previousMessageContext
       );
-
-      // TODO: Get api key from user profile. Will grab from openai env for now
-      const apiKey = process.env.OPENAI_API_KEY;
 
       const modelRow = await db
         .select()
@@ -96,7 +94,7 @@ const app = new Hono()
       allMessages.push(newMessage);
 
       const result = await streamText({
-        model: openai(model),
+        model: modelNameToProvider(model),
         messages: allMessages,
       });
 

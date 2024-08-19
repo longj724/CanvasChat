@@ -17,13 +17,7 @@ import {
   useReactFlow,
   useStoreApi,
 } from '@xyflow/react';
-import {
-  LocateFixed,
-  Maximize2,
-  PlusCircle,
-  Scroll,
-  Trash,
-} from 'lucide-react';
+import { LocateFixed, Maximize2, PlusCircle, Trash } from 'lucide-react';
 import _ from 'lodash';
 
 // Relative Dependencies
@@ -35,7 +29,6 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import ChatInput from './ChatInput';
-import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -119,7 +112,9 @@ const MessageNode = ({
     return edges.some((edge) => edge.source === id);
   }, [id, edges]);
 
-  const handleAddBottomNode = useCallback(async () => {
+  console.log('spaceId in node is:', spaceId);
+
+  const handleAddBottomNode = async () => {
     // TODO: Fix height bug where height is 0 before the node is interacted with
     const nodeHeight = height === 0 ? 420 : height;
 
@@ -142,7 +137,7 @@ const MessageNode = ({
 
     const { data } = await createChildMessageMutation.mutateAsync({
       createdFrom: Position.Bottom,
-      model,
+      model: selectedModel,
       parentMessageId: id,
       previousMessageContext: newPreviousMessageContext,
       spaceId,
@@ -151,6 +146,8 @@ const MessageNode = ({
     });
 
     const { message, edge } = data;
+
+    console.log('spaceId', spaceId);
 
     const newNode = {
       id: message[0].id,
@@ -179,7 +176,7 @@ const MessageNode = ({
 
     addNodes(newNode);
     addEdges(newEdge);
-  }, [id, positionAbsoluteX, positionAbsoluteY, addNodes, addEdges]);
+  };
 
   const handleAddRightNode = useCallback(() => {
     const newNodeId = `${id}-child-${Date.now()}`;
@@ -332,6 +329,15 @@ const MessageNode = ({
                   {/* {!userProfile?.user.OpenAIKeys?.key &&
                     'No OpenAI API Key Added'} */}
                 </SelectItem>
+                <SelectItem
+                  value="llama-3.1-8b-instant"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  llama-3.1-8b-instant{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -362,7 +368,7 @@ const MessageNode = ({
           {userMessage && (
             <MessageText
               content={userMessage as string}
-              model={model}
+              model={selectedModel}
               togglePanning={togglePanning}
               type="user"
             />
@@ -370,7 +376,7 @@ const MessageNode = ({
           {isSendingMessage && (
             <MessageText
               content={userInput}
-              model={model}
+              model={selectedModel}
               togglePanning={togglePanning}
               type="user"
             />
@@ -378,7 +384,7 @@ const MessageNode = ({
           {streamingResponse !== null && (
             <MessageText
               content={streamingResponse as string}
-              model={model}
+              model={selectedModel}
               togglePanning={togglePanning}
               type="system"
             />
@@ -386,7 +392,7 @@ const MessageNode = ({
           {responseMessage && (
             <MessageText
               content={responseMessage}
-              model={model}
+              model={selectedModel}
               togglePanning={togglePanning}
               type="system"
             />
@@ -397,7 +403,7 @@ const MessageNode = ({
               setUserInput={setUserInput}
               isLoading={isLoading}
               messageId={id}
-              model={model}
+              model={selectedModel}
               previousMessageContext={previousMessages}
               sendMessage={sendMessage}
               setIsSendingMessage={setIsSendingMessage}
