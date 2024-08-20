@@ -1,6 +1,6 @@
 // External Dependencies
-import { Dispatch, SetStateAction } from 'react';
-import { PlusCircle } from 'lucide-react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { LoaderCircle, PlusCircle } from 'lucide-react';
 import { useReactFlow, useStoreApi } from '@xyflow/react';
 import { useParams } from 'next/navigation';
 
@@ -16,6 +16,7 @@ type Props = {
 const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
   const { spaceId } = useParams();
   const { addNodes } = useReactFlow();
+  const [isLoading, setIsLoading] = useState(false);
 
   const store = useStoreApi();
   const mutation = useCreateRootMessage();
@@ -38,6 +39,7 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
   const nodeHeightOffset = 220 / 2;
 
   const onNewRootMessage = async () => {
+    setIsLoading(true);
     const { data } = await mutation.mutateAsync({
       spaceId: spaceId as string,
       xPosition: centerX - nodeWidthOffset,
@@ -66,17 +68,23 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
       type: 'messageNode',
       style: {
         // TOOD: Figure out how to calculate dynamic zIndex
+        width: 750,
         zIndex: 1000,
       },
     };
 
     addNodes(newNode);
+    setIsLoading(false);
   };
 
   return (
     <div className="absolute right-[50px] top-[12px] hover:cursor-pointer z-50">
       <Button onClick={onNewRootMessage}>
-        <PlusCircle className="h-6 w-6 mr-2" />
+        {isLoading ? (
+          <LoaderCircle className="size-6 animate-spin text-muted-foreground mr-2" />
+        ) : (
+          <PlusCircle className="h-6 w-6 mr-2" />
+        )}
         Add Message
       </Button>
     </div>
