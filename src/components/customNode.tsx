@@ -112,8 +112,6 @@ const MessageNode = ({
     return edges.some((edge) => edge.source === id);
   }, [id, edges]);
 
-  console.log('spaceId in node is:', spaceId);
-
   const handleAddBottomNode = async () => {
     // TODO: Fix height bug where height is 0 before the node is interacted with
     const nodeHeight = height === 0 ? 420 : height;

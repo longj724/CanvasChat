@@ -1,8 +1,8 @@
 'use client';
 
 // External Dependencies
-import { Dispatch, SetStateAction } from 'react';
-import { CircleUserRound, PanelsTopLeft } from 'lucide-react';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { CircleUserRound, Key, PanelsTopLeft } from 'lucide-react';
 import {
   SignedIn,
   SignedOut,
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import CreateSpaceModal from '../modals/create-space-modal';
 import { WithTooltip } from '../ui/with-tooltip';
 import { useGetSpaces } from '@/hooks/use-get-spaces';
+import ApiKeyModal from '../modals/api-key-modal';
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -26,8 +27,11 @@ interface MenuProps {
 export function Menu({ isOpen, setIsOpen }: MenuProps) {
   const { data } = useGetSpaces();
 
+  const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
+
   return (
     <nav className="flex flex-col h-full w-full">
+      <ApiKeyModal open={apiKeyModalOpen} setOpen={setApiKeyModalOpen} />
       <div className="flex flex-row h-14 items-center justify-center border-b  w-full gap-1">
         <PanelsTopLeft className="h-6 w-6" />
         {isOpen && <span className="">FlowChat</span>}
@@ -62,7 +66,19 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
 
       <SignedIn>
         <div className="flex flex-1 items-center justify-center">
-          <div className="justify-self-end self-end mb-2">
+          <div className="justify-self-end self-end mb-2 flex flex-col justify-center items-center gap-3">
+            {isOpen ? (
+              <Button onClick={() => setApiKeyModalOpen((prev) => !prev)}>
+                API Keys <Key size={16} className="ml-2" />
+              </Button>
+            ) : (
+              <Button
+                size={'icon'}
+                onClick={() => setApiKeyModalOpen((prev) => !prev)}
+              >
+                <Key size={16} />
+              </Button>
+            )}
             <UserButton showName={isOpen} />
           </div>
         </div>
