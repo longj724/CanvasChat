@@ -36,33 +36,35 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
         <PanelsTopLeft className="h-6 w-6" />
         {isOpen && <span className="">FlowChat</span>}
       </div>
-      {isOpen ? (
-        <>
-          <div className="flex flex-row items-center">
-            <h1 className="mt-3 ml-3 font-bold mb-2">Spaces</h1>
-            <div className="ml-auto mr-2 mt-3">
-              <WithTooltip
-                delayDuration={100}
-                display={<p>New Space</p>}
-                trigger={<CreateSpaceModal />}
-              />
+      <SignedIn>
+        {isOpen ? (
+          <>
+            <div className="flex flex-row items-center">
+              <h1 className="mt-3 ml-3 font-bold mb-2">Spaces</h1>
+              <div className="ml-auto mr-2 mt-3">
+                <WithTooltip
+                  delayDuration={100}
+                  display={<p>New Space</p>}
+                  trigger={<CreateSpaceModal />}
+                />
+              </div>
             </div>
+            <div className="flex flex-col w-full gap-2 justify-center items-center">
+              {data?.spaces.map((space) => (
+                <Space key={space.id} space={space} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="w-full flex flex-row items-center justify-center mt-3">
+            <WithTooltip
+              delayDuration={100}
+              display={<p>New Space</p>}
+              trigger={<CreateSpaceModal />}
+            />
           </div>
-          <div className="flex flex-col w-full gap-2 justify-center items-center">
-            {data?.spaces.map((space) => (
-              <Space key={space.id} space={space} />
-            ))}
-          </div>
-        </>
-      ) : (
-        <div className="w-full flex flex-row items-center justify-center mt-3">
-          <WithTooltip
-            delayDuration={100}
-            display={<p>New Space</p>}
-            trigger={<CreateSpaceModal />}
-          />
-        </div>
-      )}
+        )}
+      </SignedIn>
 
       <SignedIn>
         <div className="flex flex-1 items-center justify-center">

@@ -27,6 +27,7 @@ import AddMessageButton from './add-message-button';
 import { useGetMessages } from '@/hooks/use-get-messages';
 import { useUpdateMessage } from '@/hooks/use-update-message';
 import ScrollModeButton from './scroll-mode-button';
+import { SignedIn } from '@clerk/nextjs';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
@@ -120,11 +121,12 @@ const Flow = () => {
   return (
     <>
       <Sidebar />
-      {/* <SettingsModal /> */}
-      <AddMessageButton
-        togglePanning={setIsEnteringText}
-        toggleScrollMode={setIsScrollMode}
-      />
+      <SignedIn>
+        <AddMessageButton
+          togglePanning={setIsEnteringText}
+          toggleScrollMode={setIsScrollMode}
+        />
+      </SignedIn>
       <ScrollModeButton toggleScrollMode={setIsScrollMode} />
       <ReactFlow
         // @ts-ignore
