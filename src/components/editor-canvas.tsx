@@ -127,7 +127,10 @@ const Flow = () => {
           toggleScrollMode={setIsScrollMode}
         />
       </SignedIn>
-      <ScrollModeButton toggleScrollMode={setIsScrollMode} />
+      <ScrollModeButton
+        toggleScrollMode={setIsScrollMode}
+        isScrollMode={isScrollMode}
+      />
       <ReactFlow
         // @ts-ignore
         nodes={nodes}
