@@ -58,6 +58,45 @@ const app = new Hono()
       });
     }
   )
+  .post(
+    '/update-space',
+    zValidator(
+      'json',
+      z.object({
+        spaceId: z.string(),
+        name: z.string().optional(),
+      })
+    ),
+    async (c) => {
+      const body = c.req.valid('json');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const updateData: Partial<typeof spaces.$inferInsert> = {};
+
+      if ('name' in body) {
+        updateData.name = body.name;
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        return c.json({ message: 'No updates provided' }, 400);
+      }
+
+      const newSpace = await db
+        .update(spaces)
+        .set(updateData)
+        .where(eq(spaces.id, body.spaceId));
+
+      return c.json({
+        data: {
+          space: newSpace,
+        },
+      });
+    }
+  )
   .get('/', async (c) => {
     const auth = getAuth(c);
 

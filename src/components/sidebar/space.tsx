@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { SpacesResponseType } from '@/hooks/use-get-spaces';
 import { cn } from '@/lib/utils';
 import DeleteSpaceModal from '../modals/delete-space-modal';
+import EditSpaceModal from '../modals/edit-space-modal';
 
 type Props = {
   space: SpacesResponseType['data']['spaces'][0];
@@ -24,6 +25,7 @@ const Space = ({ space }: Props) => {
     >
       <span>{space.name}</span>
       <div className="flex flex-row items-center gap-2 ml-auto">
+        <EditSpaceModal spaceId={space.id} name={space.name} />
         <DeleteSpaceModal spaceID={space.id} name={space.name} />
       </div>
     </Link>
