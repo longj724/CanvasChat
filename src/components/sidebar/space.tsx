@@ -1,11 +1,11 @@
 // External Dependencies
-import { Ellipsis } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
 // Relative Dependencies
 import { SpacesResponseType } from '@/hooks/use-get-spaces';
 import { cn } from '@/lib/utils';
+import DeleteSpaceModal from '../modals/delete-space-modal';
 
 type Props = {
   space: SpacesResponseType['data']['spaces'][0];
@@ -23,7 +23,9 @@ const Space = ({ space }: Props) => {
       )}
     >
       <span>{space.name}</span>
-      <Ellipsis className="h-5 w-5 ml-auto" />
+      <div className="flex flex-row items-center gap-2 ml-auto">
+        <DeleteSpaceModal spaceID={space.id} name={space.name} />
+      </div>
     </Link>
   );
 };

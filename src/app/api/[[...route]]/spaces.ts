@@ -14,7 +14,6 @@ const app = new Hono()
     '/create-space',
     zValidator(
       'json',
-
       z.object({
         name: z.string(),
       })
@@ -35,6 +34,26 @@ const app = new Hono()
       return c.json({
         data: {
           space: newSpace,
+        },
+      });
+    }
+  )
+  .delete(
+    '/:spaceId',
+    zValidator('param', z.object({ spaceId: z.string() })),
+    async (c) => {
+      const { spaceId } = c.req.valid('param');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      await db.delete(spaces).where(eq(spaces.id, spaceId));
+
+      return c.json({
+        data: {
+          spaceId,
         },
       });
     }
