@@ -39,8 +39,7 @@ const ScrollModeButton = ({ isScrollMode, toggleScrollMode }: Props) => {
             onClick={onToggleScrollMode}
             className={cn(
               'ml-auto bg-gray-200 p-2 rounded-lg hover:bg-gray-300',
-              !store.getState().nodesDraggable &&
-                'bg-gray-700 hover:bg-gray-800'
+              isScrollMode && 'bg-gray-700 hover:bg-gray-800'
             )}
           />
         }

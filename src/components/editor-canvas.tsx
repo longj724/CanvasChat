@@ -111,6 +111,27 @@ const Flow = () => {
     }
   }, [messagesQuery.data]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 's' || event.key === 'S') {
+        if (event.metaKey || event.ctrlKey) {
+          event.preventDefault();
+          handleCommandS();
+        }
+      }
+    };
+
+    const handleCommandS = () => {
+      setIsScrollMode((prev) => !prev);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const onNodeDragStop = (event: React.MouseEvent, node: Node) => {
     updateMessageMutation.mutate({
       messageId: node.id,
