@@ -42,6 +42,7 @@ const AddMessageButton = ({ togglePanning, toggleScrollMode }: Props) => {
     setIsLoading(true);
     const { data } = await mutation.mutateAsync({
       spaceId: spaceId as string,
+      width: 750,
       xPosition: centerX - nodeWidthOffset,
       yPosition: centerY - nodeHeightOffset,
     });

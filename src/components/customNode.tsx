@@ -115,10 +115,9 @@ const MessageNode = ({
   const handleAddBottomNode = async () => {
     // TODO: Fix height bug where height is 0 before the node is interacted with
     const nodeHeight = height === 0 ? 420 : height;
-
     const newUserMessage = {
       role: 'user',
-      content: userMessage,
+      content: userMessage ?? userInput,
     };
 
     const newSystemMessage = {
@@ -139,13 +138,12 @@ const MessageNode = ({
       parentMessageId: id,
       previousMessageContext: newPreviousMessageContext,
       spaceId,
+      width: 750,
       xPosition: positionAbsoluteX,
       yPosition: positionAbsoluteY + nodeHeight + 100,
     });
 
     const { message, edge } = data;
-
-    console.log('spaceId', spaceId);
 
     const newNode = {
       id: message[0].id,
@@ -155,8 +153,8 @@ const MessageNode = ({
       },
       data: {
         createdFrom: Position.Bottom,
-        model,
-        previousMessages: [],
+        model: selectedModel,
+        previousMessages: newPreviousMessageContext,
         responseMessage: null,
         spaceId,
         togglePanning,
@@ -164,6 +162,9 @@ const MessageNode = ({
         userMessage: null,
       },
       type: 'messageNode',
+      style: {
+        width: 750,
+      },
     };
 
     const newEdge = {

@@ -145,12 +145,13 @@ const app = new Hono()
       'json',
       z.object({
         spaceId: z.string(),
+        width: z.number(),
         xPosition: z.number(),
         yPosition: z.number(),
       })
     ),
     async (c) => {
-      const { spaceId, xPosition, yPosition } = c.req.valid('json');
+      const { spaceId, width, xPosition, yPosition } = c.req.valid('json');
       const auth = getAuth(c);
 
       if (!auth?.userId) {
@@ -162,6 +163,7 @@ const app = new Hono()
         .values({
           spaceId,
           modelName: 'gpt-4o',
+          width: String(width),
           xPosition: String(xPosition),
           yPosition: String(yPosition),
         })
@@ -184,6 +186,7 @@ const app = new Hono()
         parentMessageId: z.string(),
         previousMessageContext: z.string(),
         spaceId: z.string(),
+        width: z.number(),
         xPosition: z.number(),
         yPosition: z.number(),
       })
@@ -195,6 +198,7 @@ const app = new Hono()
         parentMessageId,
         previousMessageContext,
         spaceId,
+        width,
         xPosition,
         yPosition,
       } = c.req.valid('json');
@@ -211,6 +215,7 @@ const app = new Hono()
           modelName: model,
           previousMessageContext: previousMessageContext,
           spaceId,
+          width: String(width),
           xPosition: String(xPosition),
           yPosition: String(yPosition),
         })

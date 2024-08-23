@@ -162,6 +162,8 @@ const Flow = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeDragStop={onNodeDragStop}
+        minZoom={0}
+        maxZoom={5}
         // @ts-ignore - not sure why it doesn't like width and height
         nodeTypes={nodeTypes}
         edgesUpdatable={!isScrollMode}
@@ -172,11 +174,11 @@ const Flow = () => {
         draggable={!isScrollMode && !isEnteringText}
         panOnDrag={!isScrollMode && !isEnteringText}
         // elementsSelectable={!isScrollMode}
-        zoomOnScroll={!isScrollMode && !isEnteringText}
-        zoomOnPinch={!isScrollMode}
-        panOnScrollMode={PanOnScrollMode.Vertical}
         panOnScroll={isScrollMode}
+        panOnScrollMode={PanOnScrollMode.Vertical}
         panOnScrollSpeed={1}
+        zoomOnPinch={!isScrollMode}
+        zoomOnScroll={!isScrollMode && !isEnteringText}
       >
         <Controls position="top-right" />
         <MiniMap
