@@ -1,6 +1,7 @@
 // External Dependencies
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
+  index,
   integer,
   numeric,
   pgEnum,
@@ -31,26 +32,39 @@ export const positionsEnum = pgEnum('positions', [
   'right',
 ]);
 
-export const messages = pgTable('message', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  userMessage: text('content'),
-  response: text('response'),
-  modelName: text('model_name')
-    .notNull()
-    .references(() => models.name, { onDelete: 'cascade' }),
-  spaceId: text('space_id')
-    .notNull()
-    .references(() => spaces.id, { onDelete: 'cascade' }),
-  xPosition: numeric('x_position').notNull(),
-  yPosition: numeric('y_position').notNull(),
-  createdFrom: positionsEnum('created_from'),
-  previousMessageContext: text('previous_message_context'),
-  width: numeric('width').default('420').notNull(),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
-});
+export const messages = pgTable(
+  'message',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userMessage: text('content'),
+    response: text('response'),
+    modelName: text('model_name')
+      .notNull()
+      .references(() => models.name, { onDelete: 'cascade' }),
+    spaceId: text('space_id')
+      .notNull()
+      .references(() => spaces.id, { onDelete: 'cascade' }),
+    xPosition: numeric('x_position').notNull(),
+    yPosition: numeric('y_position').notNull(),
+    createdFrom: positionsEnum('created_from'),
+    previousMessageContext: text('previous_message_context'),
+    width: numeric('width').default('420').notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userMessageSearchIndex: index('user_message_search_index').using(
+      'gin',
+      sql`to_tsvector('english', ${table.userMessage})`
+    ),
+    responseSearchIndex: index('response_search_index').using(
+      'gin',
+      sql`to_tsvector('english', ${table.response})`
+    ),
+  })
+);
 
 export const messagesRelations = relations(messages, ({ one, many }) => ({
   models: one(models, {

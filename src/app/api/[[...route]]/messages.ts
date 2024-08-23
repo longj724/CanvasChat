@@ -6,7 +6,7 @@ import { getAuth } from '@hono/clerk-auth';
 import { encode } from 'gpt-tokenizer';
 import { CoreMessage, streamText } from 'ai';
 // import { openai } from '@ai-sdk/openai';
-import { eq } from 'drizzle-orm';
+import { eq, or, sql } from 'drizzle-orm';
 
 // Relative Dependencies
 import { db } from '@/db';
@@ -344,6 +344,40 @@ const app = new Hono()
       return c.json({
         data: {
           message: message,
+        },
+      });
+    }
+  )
+  .post(
+    '/search',
+    zValidator(
+      'json',
+      z.object({
+        searchValue: z.string(),
+      })
+    ),
+    async (c) => {
+      // TODO: Not used right now
+      const { searchValue } = c.req.valid('json');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const matchingMesesages = await db
+        .select()
+        .from(messages)
+        .where(
+          or(
+            sql`to_tsvector('english', ${messages.userMessage}) @@ websearch_to_tsquery('english', ${searchValue})`,
+            sql`to_tsvector('english', ${messages.response}) @@ websearch_to_tsquery('english', ${searchValue})`
+          )
+        );
+
+      return c.json({
+        data: {
+          messages: matchingMesesages,
         },
       });
     }

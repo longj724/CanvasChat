@@ -1,0 +1,2 @@
+CREATE INDEX IF NOT EXISTS "user_message_search_index" ON "message" USING gin (to_tsvector('english', "content"));--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "response_search_index" ON "message" USING gin (to_tsvector('english', "response"));

@@ -18,6 +18,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useParams } from 'next/navigation';
+import { SignedIn } from '@clerk/nextjs';
 
 // Relative Dependencies
 import MessageNode, { MessageNodeType } from './customNode';
@@ -27,7 +28,7 @@ import AddMessageButton from './add-message-button';
 import { useGetMessages } from '@/hooks/use-get-messages';
 import { useUpdateMessage } from '@/hooks/use-update-message';
 import ScrollModeButton from './scroll-mode-button';
-import { SignedIn } from '@clerk/nextjs';
+import SpaceTextSeach from './space-text-search';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
@@ -126,6 +127,7 @@ const Flow = () => {
           togglePanning={setIsEnteringText}
           toggleScrollMode={setIsScrollMode}
         />
+        {/* <SpaceTextSeach /> */}
       </SignedIn>
       <ScrollModeButton
         toggleScrollMode={setIsScrollMode}
