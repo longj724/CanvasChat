@@ -5,8 +5,8 @@ import { zValidator } from '@hono/zod-validator';
 import { getAuth } from '@hono/clerk-auth';
 import { encode } from 'gpt-tokenizer';
 import { CoreMessage, streamText } from 'ai';
-// import { openai } from '@ai-sdk/openai';
 import { eq, or, sql } from 'drizzle-orm';
+import axios from 'axios';
 
 // Relative Dependencies
 import { db } from '@/db';
@@ -43,16 +43,17 @@ const app = new Hono()
         .from(models)
         .where(eq(models.name, model));
 
-      if (!modelRow.length) {
-        if (!auth?.userId) {
-          return c.json(
-            { error: "Couldn't connect to model to send message" },
-            401
-          );
-        }
-      }
+      // Don't want this check, going to use default context window for ollama
+      // if (!modelRow.length) {
+      //   if (!auth?.userId) {
+      //     return c.json(
+      //       { error: "Couldn't connect to model to send message" },
+      //       401
+      //     );
+      //   }
+      // }
 
-      const tokenLimit = modelRow[0].contextWindow;
+      const tokenLimit = modelRow.length ? modelRow[0].contextWindow : 4096;
       let tokensUsed = 0;
 
       const newMessageTokens = encode(userMessage).length;
@@ -101,6 +102,25 @@ const app = new Hono()
       return result.toTextStreamResponse();
     }
   )
+  .get('/ollama-models', async (c) => {
+    const auth = getAuth(c);
+
+    if (!auth?.userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const { data } = await axios.get('http://localhost:11434/api/tags', {
+      method: 'GET',
+    });
+
+    console.log('models', data.models);
+
+    return c.json({
+      data: {
+        models: data.models,
+      },
+    });
+  })
   .post(
     '/create-chained-message',
     zValidator(

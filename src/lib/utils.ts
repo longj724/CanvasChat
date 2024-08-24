@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
+import { createOllama } from 'ollama-ai-provider';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,9 +32,7 @@ export const modelNameToProvider = (modelName: string) => {
       });
       return anthropic(modelName);
     default:
-      const defaultOpenAI = createOpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-      return defaultOpenAI(modelName);
+      const ollama = createOllama();
+      return ollama(modelName);
   }
 };

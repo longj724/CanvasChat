@@ -34,6 +34,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -43,6 +44,7 @@ import { useSendMessage } from '@/hooks/use-send-message';
 import { useCreateChildMessage } from '@/hooks/use-create-child-message';
 import { WithTooltip } from '@/components/ui/with-tooltip';
 import { useDeleteMessage } from '@/hooks/use-delete-message';
+import { useGetOllamaModels } from '@/hooks/use-get-ollama-models';
 
 export interface MessageNodeType {
   id: string;
@@ -103,6 +105,8 @@ const MessageNode = ({
   const { sendMessage, isLoading, streamingResponse } = useSendMessage();
   const createChildMessageMutation = useCreateChildMessage();
   const deleteMessageMutation = useDeleteMessage(spaceId);
+
+  const ollamaModelsQuery = useGetOllamaModels();
 
   useEffect(() => {
     setWidth(initialWidth);
@@ -301,6 +305,7 @@ const MessageNode = ({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
+                <SelectLabel>OpenAI</SelectLabel>
                 <SelectItem
                   value="gpt-4o"
                   // disabled={!userProfile?.user.OpenAIKeys?.key}
@@ -328,6 +333,9 @@ const MessageNode = ({
                   {/* {!userProfile?.user.OpenAIKeys?.key &&
                     'No OpenAI API Key Added'} */}
                 </SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Groq</SelectLabel>
                 <SelectItem
                   value="llama-3.1-8b-instant"
                   // disabled={!userProfile?.user.OpenAIKeys?.key}
@@ -337,6 +345,18 @@ const MessageNode = ({
                   {/* {!userProfile?.user.OpenAIKeys?.key &&
                     'No OpenAI API Key Added'} */}
                 </SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Ollama</SelectLabel>
+                {ollamaModelsQuery?.data?.map((model) => (
+                  <SelectItem
+                    value={model.name}
+                    // disabled={!userProfile?.user.OpenAIKeys?.key}
+                    className="hover:cursor-pointer"
+                  >
+                    {model.name}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>

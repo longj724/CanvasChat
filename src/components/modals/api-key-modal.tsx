@@ -33,6 +33,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
   const formSchema = z.object({
     openAI: z.string(),
     groq: z.string(),
+    ollamaURL: z.string(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -41,6 +42,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
     defaultValues: {
       openAI: '',
       groq: '',
+      ollamaURL: '',
     },
   });
 
@@ -85,6 +87,19 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
                   <FormLabel className="w-1/5">Groq</FormLabel>
                   <FormControl className="w-full">
                     <Input placeholder="Groq" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ollamaURL"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center sm:gap-2 lg:gap-0">
+                  <FormLabel className="w-1/5">Ollama URL</FormLabel>
+                  <FormControl className="w-full">
+                    <Input placeholder="Ollama URL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
