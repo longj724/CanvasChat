@@ -19,16 +19,18 @@ import {
 import '@xyflow/react/dist/style.css';
 import { useParams } from 'next/navigation';
 import { SignedIn } from '@clerk/nextjs';
+import { useReactFlow } from '@xyflow/react';
 
 // Relative Dependencies
 import MessageNode, { MessageNodeType } from './customNode';
-import SettingsModal from './modals/settings-modal';
 import { Sidebar } from './sidebar/sidebar';
 import AddMessageButton from './add-message-button';
 import { useGetMessages } from '@/hooks/use-get-messages';
 import { useUpdateMessage } from '@/hooks/use-update-message';
 import ScrollModeButton from './scroll-mode-button';
 import SpaceTextSeach from './space-text-search';
+import CursorTooltip from './customTooltip';
+import { useCreateRootMessage } from '@/hooks/use-create-root-message';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
@@ -37,10 +39,14 @@ const Flow = () => {
   const [isEnteringText, setIsEnteringText] = useState(false);
   const [nodes, setNodes] = useState<MessageNodeType[]>([]);
   const [edges, setEdges] = useEdgesState(initialEdges);
+  const [isPlacingRootMessage, setIsPlacingRootMessage] = useState(false);
+  const [isNewRootMessageLoading, setIsNewRootMessageLoading] = useState(false);
 
   const { spaceId } = useParams();
+  const { addNodes, screenToFlowPosition } = useReactFlow();
   const messagesQuery = useGetMessages(spaceId as string);
   const updateMessageMutation = useUpdateMessage();
+  const mutation = useCreateRootMessage();
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -140,13 +146,65 @@ const Flow = () => {
     });
   };
 
+  const onPaneClick = useCallback(
+    async (event: React.MouseEvent) => {
+      if (isPlacingRootMessage) {
+        const position = screenToFlowPosition({
+          x: event.clientX,
+          y: event.clientY,
+        });
+
+        setIsNewRootMessageLoading(true);
+        const { data } = await mutation.mutateAsync({
+          spaceId: spaceId as string,
+          width: 750,
+          xPosition: position.x,
+          yPosition: position.y,
+        });
+        // TODO: Fix type, response should not be an array
+        const { message: messageList } = data;
+        const message = messageList[0];
+
+        const newNode = {
+          id: message.id,
+          position: {
+            x: position.x,
+            y: position.y,
+          },
+          data: {
+            userMessage: null,
+            responseMessage: null,
+            previousMessages: '',
+            createdFrom: null,
+            model: 'gpt-4o',
+            togglePanning: setIsEnteringText,
+            toggleScrollMode: setIsScrollMode,
+            spaceId,
+          },
+          type: 'messageNode',
+          style: {
+            // TOOD: Figure out how to calculate dynamic zIndex
+            width: 750,
+            zIndex: 1000,
+          },
+        };
+
+        addNodes(newNode);
+        setIsNewRootMessageLoading(false);
+
+        setIsPlacingRootMessage(false);
+      }
+    },
+    [isPlacingRootMessage, nodes, addNodes, screenToFlowPosition]
+  );
+
   return (
     <>
       <Sidebar />
       <SignedIn>
         <AddMessageButton
-          togglePanning={setIsEnteringText}
-          toggleScrollMode={setIsScrollMode}
+          isNewRootMessageLoading={isNewRootMessageLoading}
+          setIsPlacingRootMessage={setIsPlacingRootMessage}
         />
         {/* <SpaceTextSeach /> */}
       </SignedIn>
@@ -154,26 +212,30 @@ const Flow = () => {
         toggleScrollMode={setIsScrollMode}
         isScrollMode={isScrollMode}
       />
+      <CursorTooltip
+        content="Place Message"
+        isPlacingRootMessage={isPlacingRootMessage}
+      />
       <ReactFlow
         // @ts-ignore
         nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeDragStop={onNodeDragStop}
-        minZoom={0}
-        maxZoom={5}
         // @ts-ignore - not sure why it doesn't like width and height
         nodeTypes={nodeTypes}
-        edgesUpdatable={!isScrollMode}
-        edgesFocusable={!isScrollMode}
-        nodesDraggable={!isScrollMode}
-        nodesConnectable={!isScrollMode}
-        nodesFocusable={!isScrollMode}
-        draggable={!isScrollMode && !isEnteringText}
-        panOnDrag={!isScrollMode && !isEnteringText}
         // elementsSelectable={!isScrollMode}
+        draggable={!isScrollMode && !isEnteringText}
+        edges={edges}
+        edgesFocusable={!isScrollMode}
+        maxZoom={5}
+        minZoom={0}
+        nodesConnectable={!isScrollMode}
+        nodesDraggable={!isScrollMode}
+        nodesFocusable={!isScrollMode}
+        onConnect={onConnect}
+        onEdgesChange={onEdgesChange}
+        onNodeDragStop={onNodeDragStop}
+        onNodesChange={onNodesChange}
+        onPaneClick={onPaneClick}
+        panOnDrag={!isScrollMode && !isEnteringText}
         panOnScroll={isScrollMode}
         panOnScrollMode={PanOnScrollMode.Vertical}
         panOnScrollSpeed={1}

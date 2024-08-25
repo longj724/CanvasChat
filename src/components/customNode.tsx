@@ -350,9 +350,10 @@ const MessageNode = ({
                 <SelectLabel>Ollama</SelectLabel>
                 {ollamaModelsQuery?.data?.map((model) => (
                   <SelectItem
-                    value={model.name}
-                    // disabled={!userProfile?.user.OpenAIKeys?.key}
                     className="hover:cursor-pointer"
+                    // disabled={!userProfile?.user.OpenAIKeys?.key}
+                    key={model.name}
+                    value={model.name}
                   >
                     {model.name}
                   </SelectItem>
