@@ -43,7 +43,7 @@ const app = new Hono()
         .from(models)
         .where(eq(models.name, model));
 
-      // Don't want this check, going to use default context window for ollama
+      // Don't want this check, going to use default context window as 4096
       // if (!modelRow.length) {
       //   if (!auth?.userId) {
       //     return c.json(
@@ -109,11 +109,7 @@ const app = new Hono()
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
-    const { data } = await axios.get('http://localhost:11434/api/tags', {
-      method: 'GET',
-    });
-
-    console.log('models', data.models);
+    const { data } = await axios.get('http://localhost:11434/api/tags');
 
     return c.json({
       data: {
@@ -320,6 +316,26 @@ const app = new Hono()
       }
 
       if ('model' in body) {
+        const modelRow = await db
+          .select()
+          .from(models)
+          .where(eq(models.name, body.model as string));
+
+        if (!modelRow.length) {
+          const { data } = await axios.post('http://localhost:11434/api/show', {
+            name: body.model as string,
+          });
+
+          const contextWindow = data.model_info[
+            'llama.context_length'
+          ] as number;
+
+          await db.insert(models).values({
+            name: body.model as string,
+            contextWindow: contextWindow,
+          });
+        }
+
         updateData.modelName = body.model;
       }
 
