@@ -2,7 +2,6 @@
 import {
   Dispatch,
   SetStateAction,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -181,7 +180,7 @@ const MessageNode = ({
     addEdges(newEdge);
   };
 
-  const handleAddRightNode = useCallback(() => {
+  const handleAddRightNode = () => {
     const newNodeId = `${id}-child-${Date.now()}`;
     const newNode = {
       id: newNodeId,
@@ -211,19 +210,19 @@ const MessageNode = ({
 
     addNodes(newNode);
     addEdges(newEdge);
-  }, [id, positionAbsoluteX, positionAbsoluteY, addNodes, addEdges]);
+  };
 
-  const handleDeleteNode = useCallback(() => {
+  const handleDeleteNode = () => {
     deleteElements({ nodes: [{ id }] });
     deleteMessageMutation.mutate({ messageId: id });
-  }, [id, deleteElements]);
+  };
 
-  const handleCenterOnNode = useCallback(() => {
+  const handleCenterOnNode = () => {
     setCenter(positionAbsoluteX + width / 2, positionAbsoluteY + height / 2, {
-      zoom: 1,
+      zoom: height > 1500 ? 0.5 : 0.75,
       duration: 800,
     });
-  }, [positionAbsoluteX, positionAbsoluteY, setCenter]);
+  };
 
   const handleModelChange = (value: string) => {
     setSelectedModel(value);
