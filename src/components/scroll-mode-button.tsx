@@ -1,8 +1,8 @@
 'use client';
 
 // External Dependencies
-import { type Dispatch, type SetStateAction, useCallback } from 'react';
-import { Scroll } from 'lucide-react';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
+import { Command, Scroll } from 'lucide-react';
 import { useStoreApi } from '@xyflow/react';
 
 // Relative Dependencies
@@ -15,7 +15,20 @@ type Props = {
 };
 
 const ScrollModeButton = ({ isScrollMode, toggleScrollMode }: Props) => {
+  const [platform, setPlatform] = useState('');
   const store = useStoreApi();
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+
+    if (userAgent.includes('mac')) {
+      setPlatform('Mac');
+    } else if (userAgent.includes('win')) {
+      setPlatform('PC');
+    } else {
+      setPlatform('Other');
+    }
+  }, []);
 
   const onToggleScrollMode = () => {
     store.setState({
@@ -29,7 +42,19 @@ const ScrollModeButton = ({ isScrollMode, toggleScrollMode }: Props) => {
       <WithTooltip
         delayDuration={200}
         display={
-          isScrollMode ? <p>Disable Scroll Mode</p> : <p>Enable Scroll Mode</p>
+          isScrollMode ? (
+            <p>Disable Scroll Mode</p>
+          ) : (
+            <p className="flex items-center">
+              Enable Scroll Mode -
+              {platform === 'Mac2' ? (
+                <Command size={16} className="ml-1 inline-block" />
+              ) : (
+                <p className="inline-block ml-1 mr-1">CTRL + </p>
+              )}
+              S
+            </p>
+          )
         }
         side="left"
         trigger={
