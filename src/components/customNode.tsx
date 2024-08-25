@@ -1,20 +1,11 @@
 // External Dependencies
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import {
   Handle,
   NodeResizeControl,
   Position,
   ResizeDragEvent,
-  useEdges,
   useReactFlow,
-  useStoreApi,
 } from '@xyflow/react';
 import { LocateFixed, Maximize2, PlusCircle, Trash } from 'lucide-react';
 import _ from 'lodash';
@@ -98,8 +89,6 @@ const MessageNode = ({
   const [width, setWidth] = useState(initialWidth);
 
   const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
-  const store = useStoreApi();
-  const edges = useEdges();
   const updateMessageMutation = useUpdateMessage();
   const { sendMessage, isLoading, streamingResponse } = useSendMessage();
   const createChildMessageMutation = useCreateChildMessage();
@@ -110,10 +99,6 @@ const MessageNode = ({
   useEffect(() => {
     setWidth(initialWidth);
   }, [initialWidth]);
-
-  const hasBottomEdge = useMemo(() => {
-    return edges.some((edge) => edge.source === id);
-  }, [id, edges]);
 
   const handleAddBottomNode = async () => {
     // TODO: Fix height bug where height is 0 before the node is interacted with
@@ -174,38 +159,6 @@ const MessageNode = ({
       id: edge[0].id,
       source: id,
       target: message[0].id,
-    };
-
-    addNodes(newNode);
-    addEdges(newEdge);
-  };
-
-  const handleAddRightNode = () => {
-    const newNodeId = `${id}-child-${Date.now()}`;
-    const newNode = {
-      id: newNodeId,
-      position: {
-        x: positionAbsoluteX + width + 200,
-        y: positionAbsoluteY,
-      },
-      data: {
-        createdFrom: Position.Right,
-        previousMessages: [],
-        responseMessage: null,
-        spaceId,
-        togglePanning,
-        toggleScrollMode,
-        userMessage: null,
-      },
-      type: 'messageNode',
-    };
-
-    const newEdge = {
-      id: `${id}-${newNodeId}`,
-      source: id,
-      target: newNodeId,
-      sourceHandle: Position.Right,
-      targetHandle: Position.Left,
     };
 
     addNodes(newNode);
@@ -292,7 +245,7 @@ const MessageNode = ({
         />
       </NodeResizeControl>
 
-      <Card>
+      <Card onDoubleClick={handleCenterOnNode}>
         <CardHeader className="flex flex-row items-center justify-between">
           <Select
             value={selectedModel}
