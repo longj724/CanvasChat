@@ -40,6 +40,7 @@ export const messages = pgTable(
       .$defaultFn(() => crypto.randomUUID()),
     userMessage: text('content'),
     response: text('response'),
+    imageUrl: text('image_url'),
     modelName: text('model_name')
       .notNull()
       .references(() => models.name, { onDelete: 'cascade' }),

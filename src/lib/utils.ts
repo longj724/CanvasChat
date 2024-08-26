@@ -37,3 +37,12 @@ export const modelNameToProvider = (modelName: string) => {
       return ollama(modelName);
   }
 };
+
+export const ACCEPTED_FILE_TYPES = [
+  'text/csv',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/json',
+  'text/markdown',
+  'application/pdf',
+  'text/plain',
+].join(',');

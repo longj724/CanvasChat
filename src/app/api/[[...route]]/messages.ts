@@ -7,11 +7,24 @@ import { encode } from 'gpt-tokenizer';
 import { CoreMessage, streamText } from 'ai';
 import { eq, or, sql } from 'drizzle-orm';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+import { createClient } from '@supabase/supabase-js';
 
 // Relative Dependencies
 import { db } from '@/db';
 import { edges, messages, models } from '@/db/schema';
 import { modelNameToProvider } from '@/lib/utils';
+
+export const supabaseClient = async (supabaseToken: string) => {
+  const supabase = createClient(
+    process.env.SUPABASE_PRODUCTION_API_URL!,
+    process.env.SUPABASE_PRODUCTION_ANON_KEY!,
+    {
+      global: { headers: { Authorization: `Bearer ${supabaseToken}` } },
+    }
+  );
+  return supabase;
+};
 
 const app = new Hono()
   .post(
@@ -192,6 +205,63 @@ const app = new Hono()
       });
     }
   )
+  .post('/image-upload', async (c) => {
+    const auth = getAuth(c);
+
+    if (!auth?.userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const formData = await c.req.formData();
+    const file = formData.get('file') as File | null;
+    const messageId = formData.get('messageId') as string | null;
+    const supabaseToken = formData.get('supabaseToken') as string | null;
+    const userId = formData.get('userId') as string | null;
+
+    if (!file || !messageId || !supabaseToken) {
+      return c.json({ error: 'Error uploading file' }, 400);
+    }
+
+    const supabase = await supabaseClient(supabaseToken);
+
+    // Generate a unique filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${uuidv4()}.${fileExt}`;
+
+    // Convert File to ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    const { data, error } = await supabase.storage
+      .from('images') // Replace with your bucket name
+      .upload(`${userId}/${fileName}`, arrayBuffer, {
+        contentType: file.type,
+      });
+
+    if (error) {
+      console.error('Error uploading file:', error);
+      return c.json({ error: 'Failed to upload file' }, 500);
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(`${userId}/${fileName}`).getPublicUrl(fileName);
+
+    const updateData: Partial<typeof messages.$inferInsert> = {
+      imageUrl: publicUrl,
+    };
+
+    const newMessage = await db
+      .update(messages)
+      .set(updateData)
+      .where(eq(messages.id, messageId))
+      .returning();
+
+    return c.json({
+      data: {
+        newMessage,
+      },
+    });
+  })
   .post(
     '/create-child-message',
     zValidator(
