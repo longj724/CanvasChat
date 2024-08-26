@@ -13,6 +13,7 @@ export const modelNameToProvider = (modelName: string) => {
     case 'gpt-4-0125-preview':
     case 'gpt-4-turbo':
     case 'gpt-4o':
+    case 'gpt-4o-mini':
       const openai = createOpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });

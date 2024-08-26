@@ -285,6 +285,15 @@ const MessageNode = ({
                   {/* {!userProfile?.user.OpenAIKeys?.key &&
                     'No OpenAI API Key Added'} */}
                 </SelectItem>
+                <SelectItem
+                  value="gpt-4-0125-preview"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  gpt-4o-mini{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
               </SelectGroup>
               <SelectGroup>
                 <SelectLabel>Groq</SelectLabel>
@@ -294,6 +303,36 @@ const MessageNode = ({
                   className="hover:cursor-pointer"
                 >
                   llama-3.1-8b-instant{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Anthropic</SelectLabel>
+                <SelectItem
+                  value="claude-3-5-sonnet-20240620"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  claude-3-5-sonnet-20240620{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
+                <SelectItem
+                  value="claude-3-opus-20240229"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  claude-3-opus-20240229{' '}
+                  {/* {!userProfile?.user.OpenAIKeys?.key &&
+                    'No OpenAI API Key Added'} */}
+                </SelectItem>
+                <SelectItem
+                  value="claude-3-haiku-20240307"
+                  // disabled={!userProfile?.user.OpenAIKeys?.key}
+                  className="hover:cursor-pointer"
+                >
+                  claude-3-haiku-20240307{' '}
                   {/* {!userProfile?.user.OpenAIKeys?.key &&
                     'No OpenAI API Key Added'} */}
                 </SelectItem>
