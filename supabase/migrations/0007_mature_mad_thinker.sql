@@ -1,0 +1,1 @@
+ALTER TABLE "message" ALTER COLUMN "image_url" SET DATA TYPE text[];

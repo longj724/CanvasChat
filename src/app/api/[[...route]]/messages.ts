@@ -216,7 +216,6 @@ const app = new Hono()
     const file = formData.get('file') as File | null;
     const messageId = formData.get('messageId') as string | null;
     const supabaseToken = formData.get('supabaseToken') as string | null;
-    const userId = formData.get('userId') as string | null;
 
     if (!file || !messageId || !supabaseToken) {
       return c.json({ error: 'Error uploading file' }, 400);
@@ -228,12 +227,11 @@ const app = new Hono()
     const fileExt = file.name.split('.').pop();
     const fileName = `${uuidv4()}.${fileExt}`;
 
-    // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
 
     const { data, error } = await supabase.storage
       .from('images') // Replace with your bucket name
-      .upload(`${userId}/${fileName}`, arrayBuffer, {
+      .upload(`${auth.userId}/${fileName}`, arrayBuffer, {
         contentType: file.type,
       });
 
@@ -244,21 +242,22 @@ const app = new Hono()
 
     const {
       data: { publicUrl },
-    } = supabase.storage.from(`${userId}/${fileName}`).getPublicUrl(fileName);
+    } = supabase.storage
+      .from(`${auth.userId}/${fileName}`)
+      .getPublicUrl(fileName);
 
-    const updateData: Partial<typeof messages.$inferInsert> = {
-      imageUrl: publicUrl,
-    };
-
-    const newMessage = await db
+    await db
       .update(messages)
-      .set(updateData)
+      .set({
+        imageUrl: sql`array_append(${messages.imageUrl}::text[], ${fileName})`,
+      })
       .where(eq(messages.id, messageId))
       .returning();
 
     return c.json({
       data: {
-        newMessage,
+        imageId: fileName,
+        publicUrl,
       },
     });
   })
@@ -455,6 +454,52 @@ const app = new Hono()
       return c.json({
         data: {
           message: message,
+        },
+      });
+    }
+  )
+  .delete(
+    '/:messageId/:imageId',
+    zValidator(
+      'param',
+      z.object({ messageId: z.string(), imageId: z.string() })
+    ),
+    async (c) => {
+      const { messageId, imageId } = c.req.valid('param');
+      const auth = getAuth(c);
+
+      if (!auth?.userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const supabaseToken = c.req.header('SupabaseToken') as string;
+
+      if (!supabaseToken) {
+        return c.json({ error: 'Supabase token missing' }, 401);
+      }
+
+      const supabase = await supabaseClient(supabaseToken);
+
+      const { error } = await supabase.storage
+        .from('images')
+        .remove([`${auth.userId}/${imageId}`]);
+
+      if (error) {
+        console.error('Error deleting file:', error);
+        return c.json({ error: 'Failed to delete file' }, 500);
+      }
+
+      await db
+        .update(messages)
+        .set({
+          imageUrl: sql`array_remove(${messages.imageUrl}::text[], ${imageId})`,
+        })
+        .where(eq(messages.id, messageId))
+        .returning();
+
+      return c.json({
+        data: {
+          message: 'Successfully deleted file',
         },
       });
     }

@@ -45,4 +45,6 @@ export const ACCEPTED_FILE_TYPES = [
   'text/markdown',
   'application/pdf',
   'text/plain',
+  'image/png',
+  'image/jpeg',
 ].join(',');

@@ -50,6 +50,13 @@
       "when": 1724633942514,
       "tag": "0006_even_natasha_romanoff",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1724728376306,
+      "tag": "0007_mature_mad_thinker",
+      "breakpoints": true
     }
   ]
 }

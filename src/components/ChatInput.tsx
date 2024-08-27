@@ -5,14 +5,22 @@ import { CircleStop, Send, Paperclip } from 'lucide-react';
 import { type Dispatch, type SetStateAction, useRef, useState } from 'react';
 import { useStoreApi } from '@xyflow/react';
 import { UseMutateFunction } from '@tanstack/react-query';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
+import { toast } from 'sonner';
 
 // Relative Dependencies
 import { Input } from './ui/input';
 import { TextareaAutosize } from './ui/textarea-autosize';
 import { cn } from '@/lib/utils';
 import { ACCEPTED_FILE_TYPES } from '@/lib/utils';
-import { toast } from 'sonner';
+import FileUploadedNotification from './FileUploadedNotification';
+
+export interface FileUploadData {
+  imageId: string;
+  name: string;
+  publicUrl: string;
+  type: string;
+}
 
 type ChatInputProps = {
   messageId: string;
@@ -51,11 +59,11 @@ const ChatInput = ({
 }: ChatInputProps) => {
   const [isTyping, setIsTyping] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<FileUploadData[]>([]);
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { getToken } = useAuth();
-  const { user } = useUser();
 
   const handleInputChange = (text: string) => {
     setUserInput(text);
@@ -113,7 +121,6 @@ const ChatInput = ({
 
     const token = await getToken({ template: 'supabase' });
     formData.append('supabaseToken', token as string);
-    formData.append('userId', user?.id as string);
 
     try {
       const response = await fetch('/api/messages/image-upload', {
@@ -121,7 +128,16 @@ const ChatInput = ({
         body: formData,
       });
 
+      const { data } = await response.json();
+      const fileData: FileUploadData = {
+        imageId: data.imageId,
+        name: file.name,
+        publicUrl: data.publicUrl,
+        type: file.type,
+      };
+
       if (response.ok) {
+        setUploadedFiles((prev) => [...prev, fileData]);
         toast.success('File uploaded successfully');
       } else {
         toast.error('Failed to upload file');
@@ -153,7 +169,15 @@ const ChatInput = ({
           onCompositionEnd={() => setIsTyping(false)}
         />
 
-        <div className="absolute bottom-[14px] right-3 ml-[2px] flex cursor-pointer flex-row gap-1">
+        <div className="absolute bottom-[14px] right-3 ml-[2px] flex cursor-pointer flex-row gap-1 items-center justify-center">
+          {uploadedFiles.map((file) => (
+            <FileUploadedNotification
+              key={file.name}
+              fileData={file}
+              messageId={messageId}
+              setUploadedFiles={setUploadedFiles}
+            />
+          ))}
           <Paperclip
             className="bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
             size={32}
