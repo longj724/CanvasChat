@@ -47,7 +47,7 @@ const ScrollModeButton = ({ isScrollMode, toggleScrollMode }: Props) => {
           ) : (
             <p className="flex items-center">
               Enable Scroll Mode -
-              {platform === 'Mac2' ? (
+              {platform === 'Mac' ? (
                 <Command size={16} className="ml-1 inline-block" />
               ) : (
                 <p className="inline-block ml-1 mr-1">CTRL + </p>
