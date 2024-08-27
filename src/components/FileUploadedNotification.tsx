@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 // Relative Dependencies
 import { useDeleteFileUpload } from '@/hooks/use-delete-file-upload';
-import { FileUploadData } from './ChatInput';
+import { FileUploadData } from './customNode';
 
 interface FileUploadedNotificationProps {
   fileData: FileUploadData;

@@ -35,6 +35,7 @@ import { useCreateChildMessage } from '@/hooks/use-create-child-message';
 import { WithTooltip } from '@/components/ui/with-tooltip';
 import { useDeleteMessage } from '@/hooks/use-delete-message';
 import { useGetOllamaModels } from '@/hooks/use-get-ollama-models';
+import FileUploadedNotification from './FileUploadedNotification';
 
 export interface MessageNodeType {
   id: string;
@@ -56,6 +57,13 @@ export interface MessageType {
   toggleScrollMode: Dispatch<SetStateAction<boolean>>;
   userMessage: string | null;
   width: number;
+}
+
+export interface FileUploadData {
+  imageId: string;
+  name: string;
+  publicUrl: string;
+  type: string;
 }
 
 const MessageNode = ({
@@ -87,6 +95,7 @@ const MessageNode = ({
   const [selectedModel, setSelectedModel] = useState(model);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [width, setWidth] = useState(initialWidth);
+  const [uploadedFiles, setUploadedFiles] = useState<FileUploadData[]>([]);
 
   const { addNodes, addEdges, deleteElements, setCenter } = useReactFlow();
   const updateMessageMutation = useUpdateMessage();
@@ -101,8 +110,6 @@ const MessageNode = ({
   }, [initialWidth]);
 
   const handleAddBottomNode = async () => {
-    // TODO: Fix height bug where height is 0 before the node is interacted with
-    const nodeHeight = height === 0 ? 420 : height;
     const newUserMessage = {
       role: 'user',
       content: userMessage ?? userInput,
@@ -128,7 +135,7 @@ const MessageNode = ({
       spaceId,
       width: 750,
       xPosition: positionAbsoluteX,
-      yPosition: positionAbsoluteY + nodeHeight + 100,
+      yPosition: positionAbsoluteY + height + 100,
     });
 
     const { message, edge } = data;
@@ -137,7 +144,7 @@ const MessageNode = ({
       id: message[0].id,
       position: {
         x: positionAbsoluteX,
-        y: positionAbsoluteY + nodeHeight + 100,
+        y: positionAbsoluteY + height + 100,
       },
       data: {
         createdFrom: Position.Bottom,
@@ -410,26 +417,37 @@ const MessageNode = ({
           )}
           {!userMessage && !isSendingMessage && (
             <ChatInput
-              userInput={userInput}
-              setUserInput={setUserInput}
               isLoading={isLoading}
               messageId={id}
               model={selectedModel}
               previousMessageContext={previousMessages}
               sendMessage={sendMessage}
               setIsSendingMessage={setIsSendingMessage}
+              setUploadedFiles={setUploadedFiles}
+              setUserInput={setUserInput}
               streamingResponse={streamingResponse}
               togglePanning={togglePanning}
+              userInput={userInput}
             />
           )}
+          <div className="flex flex-row items-center gap-2 justify-end">
+            {uploadedFiles.map((file) => (
+              <FileUploadedNotification
+                key={file.name}
+                fileData={file}
+                messageId={id}
+                setUploadedFiles={setUploadedFiles}
+              />
+            ))}
+          </div>
         </CardContent>
         <CardFooter className="flex-col">
           <Button
+            className="w-full"
             disabled={!userMessage && !isSendingMessage}
             onClick={handleAddBottomNode}
             size="sm"
             variant="outline"
-            className="w-full"
           >
             <PlusCircle className="mr-2 h-4 w-4" /> Add Message
           </Button>
