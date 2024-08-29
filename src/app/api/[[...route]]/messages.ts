@@ -8,23 +8,12 @@ import { CoreMessage, streamText } from 'ai';
 import { eq, or, sql } from 'drizzle-orm';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { createClient } from '@supabase/supabase-js';
 
 // Relative Dependencies
 import { db } from '@/db';
 import { edges, messages, models } from '@/db/schema';
 import { modelNameToProvider } from '@/lib/utils';
-
-export const supabaseClient = async (supabaseToken: string) => {
-  const supabase = createClient(
-    process.env.SUPABASE_PRODUCTION_API_URL!,
-    process.env.SUPABASE_PRODUCTION_ANON_KEY!,
-    {
-      global: { headers: { Authorization: `Bearer ${supabaseToken}` } },
-    }
-  );
-  return supabase;
-};
+import { supabaseClient } from '@/lib/supabase';
 
 const app = new Hono()
   .post(
@@ -36,10 +25,11 @@ const app = new Hono()
         userMessage: z.string(),
         model: z.string(),
         previousMessageContext: z.string(),
+        fileIds: z.string().array().optional(),
       })
     ),
     async (c) => {
-      const { messageId, userMessage, model, previousMessageContext } =
+      const { messageId, userMessage, model, previousMessageContext, fileIds } =
         c.req.valid('json');
       const auth = getAuth(c);
 
