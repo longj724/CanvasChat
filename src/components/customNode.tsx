@@ -415,6 +415,15 @@ const MessageNode = ({
               type="system"
             />
           )}
+          {isLoading && !streamingResponse && (
+            <MessageText
+              content="Loading..."
+              isLoading
+              model={selectedModel}
+              togglePanning={togglePanning}
+              type="system"
+            />
+          )}
           {!userMessage && !isSendingMessage && (
             <ChatInput
               isLoading={isLoading}

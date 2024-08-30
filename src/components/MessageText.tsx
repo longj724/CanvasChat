@@ -2,7 +2,7 @@
 
 // External Dependencies
 import { type Dispatch, type SetStateAction } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, LoaderCircle } from 'lucide-react';
 import { useStoreApi } from '@xyflow/react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
@@ -15,15 +15,34 @@ import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 
 type Props = {
   content: string;
+  isLoading?: boolean;
   model: string;
   togglePanning: Dispatch<SetStateAction<boolean>>;
   type: 'user' | 'system';
 };
 
-const MessageText = ({ content, model, togglePanning, type }: Props) => {
+const MessageText = ({
+  content,
+  isLoading,
+  model,
+  togglePanning,
+  type,
+}: Props) => {
   const store = useStoreApi();
   const { user } = useUser();
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
+
+  if (isLoading) {
+    return (
+      <div
+        className={cn(
+          'flex w-full flex-row items-center justify-center py-3 bg-muted'
+        )}
+      >
+        <LoaderCircle className="animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const onCopy = () => {
     if (isCopied) return;
@@ -44,7 +63,7 @@ const MessageText = ({ content, model, togglePanning, type }: Props) => {
     }
   };
 
-  // TODO: Get this workingmes
+  // TODO: Get this working
   const onEnter = (event: React.MouseEvent<HTMLDivElement>) => {
     store.setState({
       nodesDraggable: false,
