@@ -25,7 +25,7 @@ const app = new Hono()
 
     const openAIKey = await getApiKey(userId, 'openAI', supabaseToken);
     const groqKey = await getApiKey(userId, 'groq', supabaseToken);
-    const ollamaUrl = await getApiKey(userId, 'ollama', supabaseToken);
+    const ollamaUrl = await getApiKey(userId, 'ollamaUrl', supabaseToken);
     const anthropicKey = await getApiKey(userId, 'anthropic', supabaseToken);
 
     const apiKeys = {
@@ -46,20 +46,27 @@ const app = new Hono()
     zValidator(
       'json',
       z.object({
-        supabaseToken: z.string(),
         anthropicKey: z.string().optional(),
         groqKey: z.string().optional(),
-        ollamaURL: z.string().optional(),
+        ollamaUrl: z.string().optional(),
         openAIKey: z.string().optional(),
       })
     ),
     async (c) => {
-      const { supabaseToken, anthropicKey, groqKey, ollamaURL, openAIKey } =
-        c.req.valid('json');
+      // Not sure why c.req.valid('json') doesn't work here
+      const { anthropicKey, groqKey, ollamaUrl, openAIKey } =
+        await c.req.json();
+
       const auth = getAuth(c);
 
       if (!auth?.userId) {
         return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const supabaseToken = c.req.header('SupabaseToken') as string;
+
+      if (!supabaseToken) {
+        return c.json({ error: 'Supabase token missing' }, 401);
       }
 
       const userId = auth.userId;
@@ -67,22 +74,22 @@ const app = new Hono()
       try {
         // Explicity check for undefined - it is okay if the key is an emtpy string
         if (openAIKey !== undefined) {
-          await deleteApiKey(userId, 'openAI', supabaseToken);
+          // await deleteApiKey(userId, 'openAI', supabaseToken);
           await storeApiKey(userId, 'openAI', openAIKey, supabaseToken);
         }
 
         if (groqKey !== undefined) {
-          await deleteApiKey(userId, 'groq', supabaseToken);
+          // await deleteApiKey(userId, 'groq', supabaseToken);
           await storeApiKey(userId, 'groq', groqKey, supabaseToken);
         }
 
-        if (ollamaURL !== undefined) {
-          await deleteApiKey(userId, 'ollamaUrl', supabaseToken);
-          await storeApiKey(userId, 'ollamaUrl', ollamaURL, supabaseToken);
+        if (ollamaUrl !== undefined) {
+          // await deleteApiKey(userId, 'ollamaUrl', supabaseToken);
+          await storeApiKey(userId, 'ollamaUrl', ollamaUrl, supabaseToken);
         }
 
         if (anthropicKey !== undefined) {
-          await deleteApiKey(userId, 'anthropic', supabaseToken);
+          // await deleteApiKey(userId, 'anthropic', supabaseToken);
           await storeApiKey(userId, 'anthropic', anthropicKey, supabaseToken);
         }
       } catch (error) {

@@ -23,11 +23,13 @@ export const useGetApiKeys = () => {
         throw new Error('Failed to retrieve API keys');
       }
 
-      return (await response.json()) as {
-        anthropic: string;
-        groq: string;
-        ollamaUrl: string;
-        openAI: string;
+      return (await response.json()).data as {
+        apiKeys: {
+          anthropic: string;
+          groq: string;
+          ollamaUrl: string;
+          openAI: string;
+        };
       };
     },
   });

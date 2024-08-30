@@ -62,10 +62,10 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
   useEffect(() => {
     if (data) {
       reset({
-        anthropic: data.anthropic || '',
-        groq: data.groq || '',
-        ollamaUrl: data.ollamaUrl || '',
-        openAI: data.openAI || '',
+        anthropic: data.apiKeys?.anthropic || '',
+        groq: data.apiKeys?.groq || '',
+        ollamaUrl: data.apiKeys?.ollamaUrl || '',
+        openAI: data.apiKeys?.openAI || '',
       });
     }
   }, [data, reset]);
@@ -74,11 +74,15 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
     updateApiKeysMutation.mutate(
       {
         anthropicKey:
-          values.anthropic || ((data?.anthropic as string) ? '' : undefined),
-        groqKey: values.groq || ((data?.groq as string) ? '' : undefined),
+          values.anthropic ||
+          ((data?.apiKeys.anthropic as string) ? '' : undefined),
+        groqKey:
+          values.groq || ((data?.apiKeys.groq as string) ? '' : undefined),
         ollamaUrl:
-          values.ollamaUrl || ((data?.ollamaUrl as string) ? '' : undefined),
-        openAIKey: values.openAI || ((data?.openAI as string) ? '' : undefined),
+          values.ollamaUrl ||
+          ((data?.apiKeys.ollamaUrl as string) ? '' : undefined),
+        openAIKey:
+          values.openAI || ((data?.apiKeys.openAI as string) ? '' : undefined),
       },
       {
         onSuccess: () => {
@@ -135,7 +139,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
                 <FormItem className="flex flex-row items-center sm:gap-2 lg:gap-0">
                   <FormLabel className="w-1/5">Anthropic</FormLabel>
                   <FormControl className="w-full">
-                    <PasswordInput placeholder="Antrhopic" {...field} />
+                    <PasswordInput placeholder="Anthropic" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,9 +149,9 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
               control={form.control}
               name="ollamaUrl"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center sm:gap-2 lg:gap-0">
+                <FormItem className="flex flex-row items-center justify-center sm:gap-2 lg:gap-0">
                   <FormLabel className="w-1/5">Ollama Url</FormLabel>
-                  <FormControl className="w-full">
+                  <FormControl className="w-full mt-0">
                     <Input placeholder="Ollama URL" {...field} />
                   </FormControl>
                   <FormMessage />
@@ -158,7 +162,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
             <Button type="submit" className="ml-auto">
               Submit
               {isLoading && (
-                <LoaderCircle className="animate-spin text-muted-foreground mr-2" />
+                <LoaderCircle className="animate-spin text-muted-foreground ml-2" />
               )}
             </Button>
           </form>

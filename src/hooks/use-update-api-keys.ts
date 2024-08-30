@@ -22,6 +22,7 @@ export const useUpdateApiKeys = () => {
       ollamaUrl?: string;
     }) => {
       const token = await getToken({ template: 'supabase' });
+
       if (!token) {
         throw new Error('Failed to delete file');
       }
@@ -48,8 +49,7 @@ export const useUpdateApiKeys = () => {
     onSuccess: () => {
       toast.success('API Keys updated');
     },
-    onError: (error) => {
-      console.log(error.message);
+    onError: () => {
       toast.error('Failed to update API Keys');
     },
   });

@@ -29,9 +29,9 @@ const insertSecret = async (
   supabaseToken: string
 ) => {
   const supabase = await supabaseClient(supabaseToken);
-  supabase.rpc('insert_secret', {
-    name,
-    secret,
+  await supabase.rpc('insert_secret', {
+    p_name: name,
+    p_secret: secret,
   });
 };
 
@@ -56,13 +56,17 @@ export async function deleteApiKey(
   userId: string,
   supabaseToken: string
 ) {
-  return deleteSecret(buildApiKeyName(apiKeyName, userId), supabaseToken);
+  try {
+    await deleteSecret(buildApiKeyName(apiKeyName, userId), supabaseToken);
+  } catch (error) {
+    console.error('Error deleting API key:', error);
+  }
 }
 
 const deleteSecret = async (secretName: string, supabaseToken: string) => {
   const supabase = await supabaseClient(supabaseToken);
 
-  return supabase.rpc('delete_secret', {
+  await supabase.rpc('delete_secret', {
     secret_name: secretName,
   });
 };
