@@ -18,7 +18,7 @@ type Props = {
   isLoading?: boolean;
   model: string;
   togglePanning: Dispatch<SetStateAction<boolean>>;
-  type: 'user' | 'system';
+  type: 'user' | 'system' | 'assistant';
 };
 
 const MessageText = ({
@@ -53,7 +53,8 @@ const MessageText = ({
     if (
       model === 'gpt-4-0125-preview' ||
       model === 'gpt-4-turbo' ||
-      model === 'gpt-4o'
+      model === 'gpt-4o' ||
+      model === 'gpt-4o-mini'
     ) {
       return 'https://utfs.io/f/011ccb66-ae35-4419-b2fd-51ef9175f637-mj83aa.png';
     } else if (model === 'Mixtral 8x7b') {
@@ -88,7 +89,7 @@ const MessageText = ({
       // onMouseLeave={onLeave}
     >
       <div className="flex w-11/12 flex-col ">
-        <div className="flex flex-row items-center gap-2 py-2 px-1">
+        <div className="flex flex-row items-center gap-2 py-2">
           <Image
             src={type === 'user' ? user?.imageUrl ?? '' : getModelLogo()}
             width={30}

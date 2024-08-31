@@ -29,6 +29,7 @@ type ChatInputProps = {
       userMessage: string;
       model: string;
       previousMessageContext: string;
+      supabaseToken: string;
       fileUrls?: string[] | undefined;
     },
     unknown
@@ -89,12 +90,14 @@ const ChatInput = ({
 
   const handleSendMessage = async () => {
     setIsSendingMessage(true);
+    const token = await getToken({ template: 'supabase' });
     sendMessage({
       messageId: messageId,
       userMessage: userInput,
       model: model,
       previousMessageContext:
         previousMessageContext === '' ? '{}' : previousMessageContext,
+      supabaseToken: token as string,
       fileUrls: uploadedFiles.map((file) => file.publicUrl),
     });
 

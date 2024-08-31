@@ -36,6 +36,7 @@ import { WithTooltip } from '@/components/ui/with-tooltip';
 import { useDeleteMessage } from '@/hooks/use-delete-message';
 import { useGetOllamaModels } from '@/hooks/use-get-ollama-models';
 import FileUploadedNotification from './FileUploadedNotification';
+import { useGetApiKeys } from '@/hooks/use-get-api-keys';
 
 export interface MessageNodeType {
   id: string;
@@ -102,6 +103,7 @@ const MessageNode = ({
   const { sendMessage, isLoading, streamingResponse } = useSendMessage();
   const createChildMessageMutation = useCreateChildMessage();
   const deleteMessageMutation = useDeleteMessage(spaceId);
+  const { data: apiKeyData } = useGetApiKeys();
 
   const ollamaModelsQuery = useGetOllamaModels();
 
@@ -116,7 +118,7 @@ const MessageNode = ({
     };
 
     const newSystemMessage = {
-      role: 'system',
+      role: 'assistant',
       content: responseMessage === null ? streamingResponse : responseMessage,
     };
 
@@ -266,82 +268,77 @@ const MessageNode = ({
               <SelectGroup>
                 <SelectLabel>OpenAI</SelectLabel>
                 <SelectItem
-                  value="gpt-4o"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.openAI}
+                  value="gpt-4o"
                 >
                   gpt-4o{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
                 </SelectItem>
                 <SelectItem
-                  value="gpt-4-turbo"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.openAI}
+                  value="gpt-4-turbo"
                 >
                   gpt-4-turbo{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
                 </SelectItem>
                 <SelectItem
-                  value="gpt-4-0125-preview"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.openAI}
+                  value="gpt-4-0125-preview"
                 >
                   gpt-4-0125-preview{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
                 </SelectItem>
                 <SelectItem
-                  value="gpt-4o-mini"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.openAI}
+                  value="gpt-4o-mini"
                 >
                   gpt-4o-mini{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
                 </SelectItem>
               </SelectGroup>
               <SelectGroup>
                 <SelectLabel>Groq</SelectLabel>
                 <SelectItem
-                  value="llama-3.1-8b-instant"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.groq}
+                  value="llama-3.1-8b-instant"
                 >
                   llama-3.1-8b-instant{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.groq && ' - No Groq API Key Added'}
                 </SelectItem>
               </SelectGroup>
               <SelectGroup>
                 <SelectLabel>Anthropic</SelectLabel>
                 <SelectItem
-                  value="claude-3-5-sonnet-20240620"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.anthropic}
+                  value="claude-3-5-sonnet-20240620"
                 >
                   claude-3-5-sonnet-20240620{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.anthropic &&
+                    ' - No Anthropic API Key Added'}
                 </SelectItem>
                 <SelectItem
-                  value="claude-3-opus-20240229"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.anthropic}
+                  value="claude-3-opus-20240229"
                 >
                   claude-3-opus-20240229{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.anthropic &&
+                    ' - No Anthropic API Key Added'}
                 </SelectItem>
                 <SelectItem
-                  value="claude-3-haiku-20240307"
-                  // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
+                  disabled={!apiKeyData?.apiKeys?.anthropic}
+                  value="claude-3-haiku-20240307"
                 >
                   claude-3-haiku-20240307{' '}
-                  {/* {!userProfile?.user.OpenAIKeys?.key &&
-                    'No OpenAI API Key Added'} */}
+                  {!apiKeyData?.apiKeys?.anthropic &&
+                    ' - No Anthropic API Key Added'}
                 </SelectItem>
               </SelectGroup>
               <SelectGroup>
@@ -349,11 +346,13 @@ const MessageNode = ({
                 {ollamaModelsQuery?.data?.map((model) => (
                   <SelectItem
                     className="hover:cursor-pointer"
-                    // disabled={!userProfile?.user.OpenAIKeys?.key}
+                    disabled={!apiKeyData?.apiKeys?.ollamaUrl}
                     key={model.name}
                     value={model.name}
                   >
                     {model.name}
+                    {!apiKeyData?.apiKeys?.ollamaUrl &&
+                      ' - No Ollama Url Added'}
                   </SelectItem>
                 ))}
               </SelectGroup>

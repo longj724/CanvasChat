@@ -20,6 +20,10 @@ export const useSendMessage = () => {
 
   const mutation = useMutation<string, Error, RequestType>({
     mutationFn: async (json) => {
+      if (!json.supabaseToken) {
+        throw new Error('Error sending message');
+      }
+
       const response = await client.api.messages['send-message'].$post({
         json,
       });

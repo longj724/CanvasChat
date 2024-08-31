@@ -12,8 +12,8 @@ import { v4 as uuidv4 } from 'uuid';
 // Relative Dependencies
 import { db } from '@/db';
 import { edges, messages, models } from '@/db/schema';
-import { modelNameToProvider } from '@/lib/utils';
-import { supabaseClient } from '@/lib/supabase';
+import { modelNameToApiKeyType, modelNameToProvider } from '@/lib/utils';
+import { getApiKey, supabaseClient } from '@/lib/supabase';
 
 const app = new Hono()
   .post(
@@ -22,18 +22,19 @@ const app = new Hono()
       'json',
       z.object({
         messageId: z.string(),
-        userMessage: z.string(),
         model: z.string(),
         previousMessageContext: z.string(),
+        supabaseToken: z.string(),
+        userMessage: z.string(),
         fileUrls: z.string().array().optional(),
       })
     ),
     async (c) => {
       const {
-        messageId,
-        userMessage,
         model,
         previousMessageContext,
+        supabaseToken,
+        userMessage,
         fileUrls,
       } = c.req.valid('json');
       const auth = getAuth(c);
@@ -54,6 +55,9 @@ const app = new Hono()
       if (fileUrls?.length && !modelRow[0].acceptsImages) {
         return c.json({ error: 'Model does not accept images' }, 400);
       }
+
+      const apiKeyType = modelNameToApiKeyType(model);
+      const apiKey = await getApiKey(auth.userId, apiKeyType, supabaseToken);
 
       // Don't want this check, going to use default context window as 4096
       // if (!modelRow.length) {
@@ -119,7 +123,7 @@ const app = new Hono()
       }
 
       const result = await streamText({
-        model: modelNameToProvider(model),
+        model: modelNameToProvider(model, apiKey),
         messages: allMessages,
       });
 
