@@ -293,7 +293,7 @@ const MessageNode = ({
                     'No OpenAI API Key Added'} */}
                 </SelectItem>
                 <SelectItem
-                  value="gpt-4-0125-preview"
+                  value="gpt-4o-mini"
                   // disabled={!userProfile?.user.OpenAIKeys?.key}
                   className="hover:cursor-pointer"
                 >
@@ -383,38 +383,36 @@ const MessageNode = ({
           </div>
         </CardHeader>
         <CardContent>
-          {userMessage && (
+          {userMessage ? (
             <MessageText
               content={userMessage as string}
               model={selectedModel}
               togglePanning={togglePanning}
               type="user"
             />
-          )}
-          {isSendingMessage && (
+          ) : isSendingMessage ? (
             <MessageText
               content={userInput}
               model={selectedModel}
               togglePanning={togglePanning}
               type="user"
             />
-          )}
-          {streamingResponse !== null && (
+          ) : null}
+          {streamingResponse !== null ? (
             <MessageText
               content={streamingResponse as string}
               model={selectedModel}
               togglePanning={togglePanning}
               type="system"
             />
-          )}
-          {responseMessage && (
+          ) : responseMessage ? (
             <MessageText
               content={responseMessage}
               model={selectedModel}
               togglePanning={togglePanning}
               type="system"
             />
-          )}
+          ) : null}
           {isLoading && !streamingResponse && (
             <MessageText
               content="Loading..."
@@ -437,9 +435,10 @@ const MessageNode = ({
               streamingResponse={streamingResponse}
               togglePanning={togglePanning}
               userInput={userInput}
+              uploadedFiles={uploadedFiles}
             />
           )}
-          <div className="flex flex-row items-center gap-2 justify-end">
+          <div className="flex flex-row items-center gap-2 justify-end mt-2">
             {uploadedFiles.map((file) => (
               <FileUploadedNotification
                 key={file.name}

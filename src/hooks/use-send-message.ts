@@ -43,7 +43,6 @@ export const useSendMessage = () => {
         setStreamingResponse(fullResponse);
       }
 
-      // Update the message in the database
       updateMessageMutation.mutate({
         messageId: json.messageId,
         userMessage: json.userMessage,

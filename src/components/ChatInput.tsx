@@ -1,7 +1,7 @@
 'use client';
 
 // External Dependencies
-import { CircleStop, Send, Paperclip } from 'lucide-react';
+import { CircleStop, LoaderCircle, Paperclip, Send } from 'lucide-react';
 import { type Dispatch, type SetStateAction, useRef, useState } from 'react';
 import { useStoreApi } from '@xyflow/react';
 import { UseMutateFunction } from '@tanstack/react-query';
@@ -17,11 +17,10 @@ import FileUploadedNotification from './FileUploadedNotification';
 import { FileUploadData } from './customNode';
 
 type ChatInputProps = {
+  isLoading: boolean;
   messageId: string;
   model: string;
   previousMessageContext: string;
-  setIsSendingMessage: Dispatch<SetStateAction<boolean>>;
-  togglePanning: Dispatch<SetStateAction<boolean>>;
   sendMessage: UseMutateFunction<
     string,
     Error,
@@ -30,14 +29,17 @@ type ChatInputProps = {
       userMessage: string;
       model: string;
       previousMessageContext: string;
+      fileUrls?: string[] | undefined;
     },
     unknown
   >;
-  isLoading: boolean;
-  streamingResponse: string | null;
-  userInput: string;
+  setIsSendingMessage: Dispatch<SetStateAction<boolean>>;
   setUploadedFiles: Dispatch<SetStateAction<FileUploadData[]>>;
   setUserInput: Dispatch<SetStateAction<string>>;
+  streamingResponse: string | null;
+  togglePanning: Dispatch<SetStateAction<boolean>>;
+  uploadedFiles: FileUploadData[];
+  userInput: string;
 };
 
 const ChatInput = ({
@@ -52,8 +54,10 @@ const ChatInput = ({
   setUploadedFiles,
   setUserInput,
   userInput,
+  uploadedFiles,
 }: ChatInputProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isFileUploading, setIsFileUploading] = useState(false);
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -91,6 +95,7 @@ const ChatInput = ({
       model: model,
       previousMessageContext:
         previousMessageContext === '' ? '{}' : previousMessageContext,
+      fileUrls: uploadedFiles.map((file) => file.publicUrl),
     });
 
     onLeave();
@@ -108,6 +113,8 @@ const ChatInput = ({
       toast.warning('Please select a file to upload');
       return;
     }
+
+    setIsFileUploading(true);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -139,6 +146,7 @@ const ChatInput = ({
     } catch (error) {
       toast.error('Failed to upload file');
     }
+    setIsFileUploading(false);
   };
 
   return (
@@ -162,11 +170,15 @@ const ChatInput = ({
         />
 
         <div className="absolute bottom-[14px] right-3 ml-[2px] flex cursor-pointer flex-row gap-1 items-center justify-center">
-          <Paperclip
-            className="bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-            size={32}
-            onClick={() => fileInputRef.current?.click()}
-          />
+          {isFileUploading ? (
+            <LoaderCircle className="animate-spin text-muted-foreground mr-2" />
+          ) : (
+            <Paperclip
+              className="bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
+              size={32}
+              onClick={() => fileInputRef.current?.click()}
+            />
+          )}
 
           {/* Hidden input to select files from device */}
           <Input

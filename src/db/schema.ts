@@ -1,6 +1,7 @@
 // External Dependencies
 import { relations, sql } from 'drizzle-orm';
 import {
+  boolean,
   index,
   integer,
   numeric,
@@ -96,6 +97,7 @@ export const edgesRelations = relations(edges, ({ one, many }) => ({
 
 export const models = pgTable('model', {
   name: text('name').notNull().primaryKey(),
+  acceptsImages: boolean('accepts_images').default(false).notNull(),
   displayName: text('display_name'),
   contextWindow: integer('context_window').notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),

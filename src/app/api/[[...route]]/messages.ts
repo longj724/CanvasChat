@@ -25,12 +25,17 @@ const app = new Hono()
         userMessage: z.string(),
         model: z.string(),
         previousMessageContext: z.string(),
-        fileIds: z.string().array().optional(),
+        fileUrls: z.string().array().optional(),
       })
     ),
     async (c) => {
-      const { messageId, userMessage, model, previousMessageContext, fileIds } =
-        c.req.valid('json');
+      const {
+        messageId,
+        userMessage,
+        model,
+        previousMessageContext,
+        fileUrls,
+      } = c.req.valid('json');
       const auth = getAuth(c);
 
       if (!auth?.userId) {
@@ -45,6 +50,10 @@ const app = new Hono()
         .select()
         .from(models)
         .where(eq(models.name, model));
+
+      if (fileUrls?.length && !modelRow[0].acceptsImages) {
+        return c.json({ error: 'Model does not accept images' }, 400);
+      }
 
       // Don't want this check, going to use default context window as 4096
       // if (!modelRow.length) {
@@ -61,6 +70,9 @@ const app = new Hono()
 
       const newMessageTokens = encode(userMessage).length;
       tokensUsed += newMessageTokens;
+
+      // This is best estimate I could fine - apparently accurate for OpenAI
+      tokensUsed += (fileUrls?.length ?? 0) * 85;
 
       if (tokensUsed > tokenLimit) {
         return c.json({ error: 'Message is too long' }, 400);
@@ -96,6 +108,15 @@ const app = new Hono()
 
       // Put new message at the end
       allMessages.push(newMessage);
+
+      if (fileUrls?.length) {
+        fileUrls.forEach((fileUrl) => {
+          allMessages.push({
+            role: 'user',
+            content: [{ type: 'image', image: new URL(fileUrl) }],
+          });
+        });
+      }
 
       const result = await streamText({
         model: modelNameToProvider(model),
@@ -233,13 +254,13 @@ const app = new Hono()
     const {
       data: { publicUrl },
     } = supabase.storage
-      .from(`${auth.userId}/${fileName}`)
-      .getPublicUrl(fileName);
+      .from('images')
+      .getPublicUrl(`${auth.userId}/${fileName}`);
 
     await db
       .update(messages)
       .set({
-        imageUrl: sql`array_append(${messages.imageUrl}::text[], ${fileName})`,
+        imageUrl: sql`array_append(${messages.imageUrl}::text[], ${publicUrl})`,
       })
       .where(eq(messages.id, messageId))
       .returning();
@@ -389,8 +410,10 @@ const app = new Hono()
             'llama.context_length'
           ] as number;
 
+          // For now not supporting local models that accept images
           await db.insert(models).values({
             name: body.model as string,
+            acceptsImages: false,
             contextWindow: contextWindow,
           });
         }
