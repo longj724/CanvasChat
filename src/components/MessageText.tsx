@@ -57,10 +57,17 @@ const MessageText = ({
       model === 'gpt-4o-mini'
     ) {
       return 'https://utfs.io/f/011ccb66-ae35-4419-b2fd-51ef9175f637-mj83aa.png';
-    } else if (model === 'Mixtral 8x7b') {
-      return 'https://utfs.io/f/03683c6c-b30c-4f90-8e22-7b7335e6bd09-frsh8w.png';
-    } else {
+    } else if (model === 'llama-3.1-8b-instant') {
       return 'https://utfs.io/f/5d86278f-f1a9-470f-8613-fe8dc1d102a0-q2n0kg.jpeg';
+    } else if (
+      model === 'claude-3-5-sonnet-20240620' ||
+      model === 'claude-3-opus-20240229' ||
+      model === 'claude-3-haiku-20240307'
+    ) {
+      return 'https://mwbkkujllezvgvvudxer.supabase.co/storage/v1/object/public/general/anthropic-logo.png';
+    } else {
+      // Logo for local ollama models
+      return 'https://mwbkkujllezvgvvudxer.supabase.co/storage/v1/object/public/general/ollama-logo.png';
     }
   };
 
