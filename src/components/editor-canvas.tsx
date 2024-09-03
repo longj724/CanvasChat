@@ -25,6 +25,7 @@ import { useReactFlow } from '@xyflow/react';
 import MessageNode, { MessageNodeType } from './customNode';
 import { Sidebar } from './sidebar/sidebar';
 import AddMessageButton from './add-message-button';
+import AddContextMessageButton from './add-context-message-button';
 import { useGetMessages } from '@/hooks/use-get-messages';
 import { useUpdateMessage } from '@/hooks/use-update-message';
 import ScrollModeButton from './scroll-mode-button';
@@ -40,7 +41,10 @@ const Flow = () => {
   const [nodes, setNodes] = useState<MessageNodeType[]>([]);
   const [edges, setEdges] = useEdgesState(initialEdges);
   const [isPlacingRootMessage, setIsPlacingRootMessage] = useState(false);
+  const [isPlacingContextMessage, setIsPlacingContextMessage] = useState(false);
   const [isNewRootMessageLoading, setIsNewRootMessageLoading] = useState(false);
+  const [isNewContextMessageLoading, setIsNewContextMessageLoading] =
+    useState(false);
 
   const { spaceId } = useParams();
   const { addNodes, screenToFlowPosition } = useReactFlow();
@@ -150,15 +154,20 @@ const Flow = () => {
 
   const onPaneClick = useCallback(
     async (event: React.MouseEvent) => {
-      if (isPlacingRootMessage) {
+      if (isPlacingRootMessage || isPlacingContextMessage) {
         const position = screenToFlowPosition({
           x: event.clientX,
           y: event.clientY,
         });
 
-        setIsNewRootMessageLoading(true);
+        if (isPlacingContextMessage) {
+          setIsNewContextMessageLoading(true);
+        } else {
+          setIsNewRootMessageLoading(true);
+        }
+
         const { data } = await createRootMessageMutation.mutateAsync({
-          isSystemMessage: false,
+          isSystemMessage: isPlacingContextMessage,
           spaceId: spaceId as string,
           width: 750,
           xPosition: position.x,
@@ -175,6 +184,7 @@ const Flow = () => {
             y: position.y,
           },
           data: {
+            isSystemMessage: isPlacingContextMessage,
             userMessage: null,
             responseMessage: null,
             previousMessages: '',
@@ -193,12 +203,23 @@ const Flow = () => {
         };
 
         addNodes(newNode);
-        setIsNewRootMessageLoading(false);
 
-        setIsPlacingRootMessage(false);
+        if (isPlacingContextMessage) {
+          setIsNewContextMessageLoading(false);
+          setIsPlacingContextMessage(false);
+        } else {
+          setIsNewRootMessageLoading(false);
+          setIsPlacingRootMessage(false);
+        }
       }
     },
-    [isPlacingRootMessage, nodes, addNodes, screenToFlowPosition]
+    [
+      isPlacingRootMessage,
+      isPlacingContextMessage,
+      nodes,
+      addNodes,
+      screenToFlowPosition,
+    ]
   );
 
   return (
@@ -209,6 +230,10 @@ const Flow = () => {
           isNewRootMessageLoading={isNewRootMessageLoading}
           setIsPlacingRootMessage={setIsPlacingRootMessage}
         />
+        <AddContextMessageButton
+          isNewContextMessageLoading={isNewContextMessageLoading}
+          setIsPlacingContextMessage={setIsPlacingContextMessage}
+        />
         {/* <SpaceTextSeach /> */}
       </SignedIn>
       <ScrollModeButton
@@ -217,7 +242,7 @@ const Flow = () => {
       />
       <CursorTooltip
         content="Place Message"
-        isPlacingRootMessage={isPlacingRootMessage}
+        isPlacingRootMessage={isPlacingRootMessage || isPlacingContextMessage}
       />
       <ReactFlow
         // @ts-ignore
