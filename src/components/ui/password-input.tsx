@@ -13,7 +13,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
     const [showPassword, setShowPassword] = React.useState(false);
 
     return (
-      <div className="flex gap-2 items-center w-full">
+      <div className="flex gap-2 items-center w-full !mt-0">
         <Input
           className={className}
           {...props}
