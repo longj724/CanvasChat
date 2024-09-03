@@ -34,7 +34,7 @@ export const modelNameToProvider = (modelName: string, apiKey: string) => {
       return anthropic(modelName);
     default:
       const ollama = createOllama({
-        baseURL: apiKey,
+        baseURL: apiKey + '/api',
       });
       return ollama(modelName);
   }

@@ -39,6 +39,8 @@ export const messages = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
+    context: text('context'),
+    isSystemMessage: boolean('is_system_message').default(false),
     userMessage: text('content'),
     response: text('response'),
     imageUrl: text('image_url').array(),

@@ -37,6 +37,7 @@ import { useDeleteMessage } from '@/hooks/use-delete-message';
 import { useGetOllamaModels } from '@/hooks/use-get-ollama-models';
 import FileUploadedNotification from './FileUploadedNotification';
 import { useGetApiKeys } from '@/hooks/use-get-api-keys';
+import SystemMessageInput from './SystemMessageInput';
 
 export interface MessageNodeType {
   id: string;
@@ -49,7 +50,9 @@ export interface MessageNodeType {
 }
 
 export interface MessageType {
+  context: string | null;
   createdFrom: Position | null;
+  isSystemMessage: boolean;
   model: string;
   previousMessages: string;
   responseMessage: string | null;
@@ -81,10 +84,12 @@ const MessageNode = ({
   positionAbsoluteY: number;
 }) => {
   const {
+    context,
     createdFrom,
+    isSystemMessage,
+    model,
     previousMessages,
     responseMessage,
-    model,
     spaceId,
     togglePanning,
     toggleScrollMode,
@@ -111,26 +116,38 @@ const MessageNode = ({
     setWidth(initialWidth);
   }, [initialWidth]);
 
-  const handleAddBottomNode = async () => {
-    const newUserMessage = {
-      role: 'user',
-      content: userMessage ?? userInput,
-    };
+  const handleAddBottomNode = async (isAddingContextNode: boolean) => {
+    let previousMessagesAsArray = [];
+    if (isSystemMessage) {
+      const newContextMessage = {
+        role: 'system',
+        content: context ?? userInput,
+      };
+      previousMessagesAsArray =
+        previousMessages === '' ? [] : JSON.parse(previousMessages);
+      previousMessagesAsArray.push(newContextMessage);
+    } else {
+      const newUserMessage = {
+        role: 'user',
+        content: userMessage ?? userInput,
+      };
 
-    const newSystemMessage = {
-      role: 'assistant',
-      content: responseMessage === null ? streamingResponse : responseMessage,
-    };
+      const newSystemMessage = {
+        role: 'assistant',
+        content: responseMessage === null ? streamingResponse : responseMessage,
+      };
 
-    const previousMessagesAsArray =
-      previousMessages === '' ? [] : JSON.parse(previousMessages);
-    previousMessagesAsArray.push(newUserMessage);
-    previousMessagesAsArray.push(newSystemMessage);
+      previousMessagesAsArray =
+        previousMessages === '' ? [] : JSON.parse(previousMessages);
+      previousMessagesAsArray.push(newUserMessage);
+      previousMessagesAsArray.push(newSystemMessage);
+    }
 
     const newPreviousMessageContext = JSON.stringify(previousMessagesAsArray);
 
     const { data } = await createChildMessageMutation.mutateAsync({
       createdFrom: Position.Bottom,
+      isSystemMessage: isAddingContextNode,
       model: selectedModel,
       parentMessageId: id,
       previousMessageContext: newPreviousMessageContext,
@@ -150,6 +167,7 @@ const MessageNode = ({
       },
       data: {
         createdFrom: Position.Bottom,
+        isSystemMessage: isAddingContextNode,
         model: selectedModel,
         previousMessages: newPreviousMessageContext,
         responseMessage: null,
@@ -254,212 +272,238 @@ const MessageNode = ({
         />
       </NodeResizeControl>
 
-      <Card onDoubleClick={handleCenterOnNode}>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <Select
-            value={selectedModel}
-            onValueChange={handleModelChange}
-            disabled={userMessage !== null || isSendingMessage}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder={model} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>OpenAI</SelectLabel>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.openAI}
-                  value="gpt-4o"
-                >
-                  gpt-4o{' '}
-                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
-                </SelectItem>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.openAI}
-                  value="gpt-4-turbo"
-                >
-                  gpt-4-turbo{' '}
-                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
-                </SelectItem>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.openAI}
-                  value="gpt-4-0125-preview"
-                >
-                  gpt-4-0125-preview{' '}
-                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
-                </SelectItem>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.openAI}
-                  value="gpt-4o-mini"
-                >
-                  gpt-4o-mini{' '}
-                  {!apiKeyData?.apiKeys?.openAI && ' - No OpenAI API Key Added'}
-                </SelectItem>
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Groq</SelectLabel>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.groq}
-                  value="llama-3.1-8b-instant"
-                >
-                  llama-3.1-8b-instant{' '}
-                  {!apiKeyData?.apiKeys?.groq && ' - No Groq API Key Added'}
-                </SelectItem>
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Anthropic</SelectLabel>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.anthropic}
-                  value="claude-3-5-sonnet-20240620"
-                >
-                  claude-3-5-sonnet-20240620{' '}
-                  {!apiKeyData?.apiKeys?.anthropic &&
-                    ' - No Anthropic API Key Added'}
-                </SelectItem>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.anthropic}
-                  value="claude-3-opus-20240229"
-                >
-                  claude-3-opus-20240229{' '}
-                  {!apiKeyData?.apiKeys?.anthropic &&
-                    ' - No Anthropic API Key Added'}
-                </SelectItem>
-                <SelectItem
-                  className="hover:cursor-pointer"
-                  disabled={!apiKeyData?.apiKeys?.anthropic}
-                  value="claude-3-haiku-20240307"
-                >
-                  claude-3-haiku-20240307{' '}
-                  {!apiKeyData?.apiKeys?.anthropic &&
-                    ' - No Anthropic API Key Added'}
-                </SelectItem>
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Ollama</SelectLabel>
-                {ollamaModelsQuery?.data?.map((model) => (
+      {isSystemMessage ? (
+        <SystemMessageInput
+          context={context}
+          handleAddBottomNode={handleAddBottomNode}
+          handleCenterOnNode={handleCenterOnNode}
+          handleDeleteNode={handleDeleteNode}
+          messageId={id}
+          setUploadedFiles={setUploadedFiles}
+          togglePanning={togglePanning}
+          uploadedFiles={uploadedFiles}
+        />
+      ) : (
+        <Card onDoubleClick={handleCenterOnNode}>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <Select
+              value={selectedModel}
+              onValueChange={handleModelChange}
+              disabled={userMessage !== null || isSendingMessage}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder={model} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>OpenAI</SelectLabel>
                   <SelectItem
                     className="hover:cursor-pointer"
-                    disabled={!apiKeyData?.apiKeys?.ollamaUrl}
-                    key={model.name}
-                    value={model.name}
+                    disabled={!apiKeyData?.apiKeys?.openAI}
+                    value="gpt-4o"
                   >
-                    {model.name}
-                    {!apiKeyData?.apiKeys?.ollamaUrl &&
-                      ' - No Ollama Url Added'}
+                    gpt-4o{' '}
+                    {!apiKeyData?.apiKeys?.openAI &&
+                      ' - No OpenAI API Key Added'}
                   </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <div className="flex items-center ml-auto gap-2">
-            <WithTooltip
-              delayDuration={200}
-              display={<p>Center On Node</p>}
-              side="top"
-              trigger={
-                <Button size={'icon'} className="ml-auto">
-                  <LocateFixed onClick={handleCenterOnNode} />
-                </Button>
-              }
-            />
-            <WithTooltip
-              delayDuration={200}
-              display={<p>Delete Message</p>}
-              side="top"
-              trigger={
-                <Button size={'icon'} className="ml-auto">
-                  <Trash onClick={handleDeleteNode} />
-                </Button>
-              }
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
-          {userMessage ? (
-            <MessageText
-              content={userMessage as string}
-              model={selectedModel}
-              togglePanning={togglePanning}
-              type="user"
-            />
-          ) : isSendingMessage ? (
-            <MessageText
-              content={userInput}
-              model={selectedModel}
-              togglePanning={togglePanning}
-              type="user"
-            />
-          ) : null}
-          {streamingResponse !== null ? (
-            <MessageText
-              content={streamingResponse as string}
-              model={selectedModel}
-              togglePanning={togglePanning}
-              type="system"
-            />
-          ) : responseMessage ? (
-            <MessageText
-              content={responseMessage}
-              model={selectedModel}
-              togglePanning={togglePanning}
-              type="system"
-            />
-          ) : null}
-          {isLoading && !streamingResponse && (
-            <MessageText
-              content="Loading..."
-              isLoading
-              model={selectedModel}
-              togglePanning={togglePanning}
-              type="system"
-            />
-          )}
-          {!userMessage && !isSendingMessage && (
-            <ChatInput
-              isLoading={isLoading}
-              messageId={id}
-              model={selectedModel}
-              previousMessageContext={previousMessages}
-              sendMessage={sendMessage}
-              setIsSendingMessage={setIsSendingMessage}
-              setUploadedFiles={setUploadedFiles}
-              setUserInput={setUserInput}
-              streamingResponse={streamingResponse}
-              togglePanning={togglePanning}
-              userInput={userInput}
-              uploadedFiles={uploadedFiles}
-            />
-          )}
-          <div className="flex flex-row items-center gap-2 justify-end mt-2">
-            {uploadedFiles.map((file) => (
-              <FileUploadedNotification
-                key={file.name}
-                fileData={file}
-                messageId={id}
-                setUploadedFiles={setUploadedFiles}
+                  <SelectItem
+                    className="hover:cursor-pointer"
+                    disabled={!apiKeyData?.apiKeys?.openAI}
+                    value="gpt-4-turbo"
+                  >
+                    gpt-4-turbo{' '}
+                    {!apiKeyData?.apiKeys?.openAI &&
+                      ' - No OpenAI API Key Added'}
+                  </SelectItem>
+                  <SelectItem
+                    className="hover:cursor-pointer"
+                    disabled={!apiKeyData?.apiKeys?.openAI}
+                    value="gpt-4-0125-preview"
+                  >
+                    gpt-4-0125-preview{' '}
+                    {!apiKeyData?.apiKeys?.openAI &&
+                      ' - No OpenAI API Key Added'}
+                  </SelectItem>
+                  <SelectItem
+                    className="hover:cursor-pointer"
+                    disabled={!apiKeyData?.apiKeys?.openAI}
+                    value="gpt-4o-mini"
+                  >
+                    gpt-4o-mini{' '}
+                    {!apiKeyData?.apiKeys?.openAI &&
+                      ' - No OpenAI API Key Added'}
+                  </SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Groq</SelectLabel>
+                  <SelectItem
+                    className="hover:cursor-pointer"
+                    disabled={!apiKeyData?.apiKeys?.groq}
+                    value="llama-3.1-8b-instant"
+                  >
+                    llama-3.1-8b-instant{' '}
+                    {!apiKeyData?.apiKeys?.groq && ' - No Groq API Key Added'}
+                  </SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Anthropic</SelectLabel>
+                  <SelectItem
+                    className="hover:cursor-pointer"
+                    disabled={!apiKeyData?.apiKeys?.anthropic}
+                    value="claude-3-5-sonnet-20240620"
+                  >
+                    claude-3-5-sonnet-20240620{' '}
+                    {!apiKeyData?.apiKeys?.anthropic &&
+                      ' - No Anthropic API Key Added'}
+                  </SelectItem>
+                  <SelectItem
+                    className="hover:cursor-pointer"
+                    disabled={!apiKeyData?.apiKeys?.anthropic}
+                    value="claude-3-opus-20240229"
+                  >
+                    claude-3-opus-20240229{' '}
+                    {!apiKeyData?.apiKeys?.anthropic &&
+                      ' - No Anthropic API Key Added'}
+                  </SelectItem>
+                  <SelectItem
+                    className="hover:cursor-pointer"
+                    disabled={!apiKeyData?.apiKeys?.anthropic}
+                    value="claude-3-haiku-20240307"
+                  >
+                    claude-3-haiku-20240307{' '}
+                    {!apiKeyData?.apiKeys?.anthropic &&
+                      ' - No Anthropic API Key Added'}
+                  </SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Ollama</SelectLabel>
+                  {ollamaModelsQuery?.data?.map((model) => (
+                    <SelectItem
+                      className="hover:cursor-pointer"
+                      disabled={!apiKeyData?.apiKeys?.ollamaUrl}
+                      key={model.name}
+                      value={model.name}
+                    >
+                      {model.name}
+                      {!apiKeyData?.apiKeys?.ollamaUrl &&
+                        ' - No Ollama Url Added'}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center ml-auto gap-2">
+              <WithTooltip
+                delayDuration={200}
+                display={<p>Center On Node</p>}
+                side="top"
+                trigger={
+                  <Button size={'icon'} className="ml-auto">
+                    <LocateFixed onClick={handleCenterOnNode} />
+                  </Button>
+                }
               />
-            ))}
-          </div>
-        </CardContent>
-        <CardFooter className="flex-col">
-          <Button
-            className="w-full"
-            disabled={!userMessage && !isSendingMessage}
-            onClick={handleAddBottomNode}
-            size="sm"
-            variant="outline"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Message
-          </Button>
-        </CardFooter>
-      </Card>
+              <WithTooltip
+                delayDuration={200}
+                display={<p>Delete Message</p>}
+                side="top"
+                trigger={
+                  <Button size={'icon'} className="ml-auto">
+                    <Trash onClick={handleDeleteNode} />
+                  </Button>
+                }
+              />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {userMessage ? (
+              <MessageText
+                content={userMessage as string}
+                model={selectedModel}
+                togglePanning={togglePanning}
+                type="user"
+              />
+            ) : isSendingMessage ? (
+              <MessageText
+                content={userInput}
+                model={selectedModel}
+                togglePanning={togglePanning}
+                type="user"
+              />
+            ) : null}
+            {streamingResponse !== null ? (
+              <MessageText
+                content={streamingResponse as string}
+                model={selectedModel}
+                togglePanning={togglePanning}
+                type="system"
+              />
+            ) : responseMessage ? (
+              <MessageText
+                content={responseMessage}
+                model={selectedModel}
+                togglePanning={togglePanning}
+                type="system"
+              />
+            ) : null}
+            {isLoading && !streamingResponse && (
+              <MessageText
+                content="Loading..."
+                isLoading
+                model={selectedModel}
+                togglePanning={togglePanning}
+                type="system"
+              />
+            )}
+            {!userMessage && !isSendingMessage && (
+              <ChatInput
+                isLoading={isLoading}
+                messageId={id}
+                model={selectedModel}
+                previousMessageContext={previousMessages}
+                sendMessage={sendMessage}
+                setIsSendingMessage={setIsSendingMessage}
+                setUploadedFiles={setUploadedFiles}
+                setUserInput={setUserInput}
+                streamingResponse={streamingResponse}
+                togglePanning={togglePanning}
+                userInput={userInput}
+                uploadedFiles={uploadedFiles}
+              />
+            )}
+            <div className="flex flex-row items-center gap-2 justify-end mt-2">
+              {uploadedFiles.map((file) => (
+                <FileUploadedNotification
+                  key={file.name}
+                  fileData={file}
+                  messageId={id}
+                  setUploadedFiles={setUploadedFiles}
+                />
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter className="flex-row gap-2">
+            <Button
+              className="w-full"
+              disabled={!userMessage && !isSendingMessage}
+              onClick={() => handleAddBottomNode(false)}
+              size="sm"
+              variant="outline"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Message
+            </Button>
+            <Button
+              className="w-full"
+              disabled={!userMessage && !isSendingMessage}
+              onClick={() => handleAddBottomNode(true)}
+              size="sm"
+              variant="outline"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Context
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
     </>
   );
 };

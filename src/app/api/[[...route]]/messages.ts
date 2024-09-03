@@ -150,15 +150,17 @@ const app = new Hono()
     zValidator(
       'json',
       z.object({
+        isSystemMessage: z.boolean(),
+        messageId: z.string(),
+        previousMesageContext: z.string(),
         spaceId: z.string(),
         xPosition: z.number(),
         yPosition: z.number(),
-        messageId: z.string(),
-        previousMesageContext: z.string(),
       })
     ),
     async (c) => {
-      const { spaceId, xPosition, yPosition, messageId } = c.req.valid('json');
+      const { spaceId, xPosition, yPosition, messageId, isSystemMessage } =
+        c.req.valid('json');
       const auth = getAuth(c);
 
       if (!auth?.userId) {
@@ -169,6 +171,7 @@ const app = new Hono()
         .insert(messages)
         .values({
           spaceId,
+          isSystemMessage,
           modelName: 'gpt-4o',
           xPosition: String(xPosition),
           yPosition: String(yPosition),
@@ -188,6 +191,7 @@ const app = new Hono()
     zValidator(
       'json',
       z.object({
+        isSystemMessage: z.boolean(),
         spaceId: z.string(),
         width: z.number(),
         xPosition: z.number(),
@@ -195,7 +199,8 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const { spaceId, width, xPosition, yPosition } = c.req.valid('json');
+      const { spaceId, width, xPosition, yPosition, isSystemMessage } =
+        c.req.valid('json');
       const auth = getAuth(c);
 
       if (!auth?.userId) {
@@ -205,8 +210,9 @@ const app = new Hono()
       const newMessage = await db
         .insert(messages)
         .values({
-          spaceId,
+          isSystemMessage,
           modelName: 'gpt-4o',
+          spaceId,
           width: String(width),
           xPosition: String(xPosition),
           yPosition: String(yPosition),
@@ -282,6 +288,7 @@ const app = new Hono()
       'json',
       z.object({
         createdFrom: z.enum(['top', 'bottom', 'left', 'right']),
+        isSystemMessage: z.boolean(),
         model: z.string(),
         parentMessageId: z.string(),
         previousMessageContext: z.string(),
@@ -294,6 +301,7 @@ const app = new Hono()
     async (c) => {
       const {
         createdFrom,
+        isSystemMessage,
         model,
         parentMessageId,
         previousMessageContext,
@@ -311,9 +319,10 @@ const app = new Hono()
       const newMessage = await db
         .insert(messages)
         .values({
-          createdFrom: createdFrom,
+          createdFrom,
+          isSystemMessage,
           modelName: model,
-          previousMessageContext: previousMessageContext,
+          previousMessageContext,
           spaceId,
           width: String(width),
           xPosition: String(xPosition),
@@ -373,6 +382,7 @@ const app = new Hono()
       'json',
       z.object({
         messageId: z.string(),
+        context: z.string().optional(),
         xPosition: z.number().optional(),
         yPosition: z.number().optional(),
         model: z.string().optional(),
@@ -435,6 +445,10 @@ const app = new Hono()
 
       if ('width' in body) {
         updateData.width = String(body.width);
+      }
+
+      if ('context' in body) {
+        updateData.context = body.context;
       }
 
       if (Object.keys(updateData).length === 0) {

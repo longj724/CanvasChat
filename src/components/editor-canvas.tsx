@@ -46,7 +46,7 @@ const Flow = () => {
   const { addNodes, screenToFlowPosition } = useReactFlow();
   const messagesQuery = useGetMessages(spaceId as string);
   const updateMessageMutation = useUpdateMessage();
-  const mutation = useCreateRootMessage();
+  const createRootMessageMutation = useCreateRootMessage();
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -86,7 +86,9 @@ const Flow = () => {
           y: Number(message.yPosition),
         },
         data: {
+          context: message.context,
           createdFrom: (message.createdFrom as Position) ?? null,
+          isSystemMessage: message.isSystemMessage ?? false,
           model: message.modelName,
           previousMessages: message.previousMessageContext ?? '',
           responseMessage: message.response,
@@ -155,7 +157,8 @@ const Flow = () => {
         });
 
         setIsNewRootMessageLoading(true);
-        const { data } = await mutation.mutateAsync({
+        const { data } = await createRootMessageMutation.mutateAsync({
+          isSystemMessage: false,
           spaceId: spaceId as string,
           width: 750,
           xPosition: position.x,
