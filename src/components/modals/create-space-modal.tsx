@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 // Relative Dependencies
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ import { useCreateSpace } from '@/hooks/use-create-space';
 const CreateSpaceModal = () => {
   const [open, setOpen] = useState(false);
   const mutation = useCreateSpace();
+  const router = useRouter();
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (!data.name) {
@@ -40,8 +42,9 @@ const CreateSpaceModal = () => {
           name: data.name,
         },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
             setOpen(false);
+            router.push(`/space/${data.data.space[0].id}`);
             form.reset();
           },
         }

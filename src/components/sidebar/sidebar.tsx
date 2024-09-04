@@ -9,7 +9,7 @@ import { Menu } from '@/components/sidebar/menu';
 import { SidebarToggle } from '@/components/sidebar/sidebar-toggle';
 
 export function Sidebar() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <aside

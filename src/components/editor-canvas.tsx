@@ -267,7 +267,7 @@ const Flow = () => {
         panOnScroll={isScrollMode}
         panOnScrollMode={PanOnScrollMode.Vertical}
         panOnScrollSpeed={1}
-        zoomOnPinch={!isScrollMode}
+        // zoomOnPinch={!isScrollMode}
         zoomOnScroll={!isScrollMode && !isEnteringText}
       >
         <Controls position="top-right" />

@@ -1,6 +1,7 @@
 'use client';
 // External Dependencies
 import { Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Relative Dependencies
 import {
@@ -23,9 +24,17 @@ type Props = {
 
 const DeleteSpaceModal = ({ spaceID, name }: Props) => {
   const deleteSpaceMutation = useDeleteSpace();
+  const router = useRouter();
 
   const handleDeleteSpace = async () => {
-    deleteSpaceMutation.mutate({ spaceId: spaceID });
+    deleteSpaceMutation.mutate(
+      { spaceId: spaceID },
+      {
+        onSuccess: () => {
+          router.back();
+        },
+      }
+    );
   };
 
   return (
