@@ -20,6 +20,7 @@ import '@xyflow/react/dist/style.css';
 import { useParams } from 'next/navigation';
 import { SignedIn } from '@clerk/nextjs';
 import { useReactFlow } from '@xyflow/react';
+import { SquareMousePointer } from 'lucide-react';
 
 // Relative Dependencies
 import MessageNode, { MessageNodeType } from './customNode';
@@ -235,6 +236,16 @@ const Flow = () => {
           setIsPlacingContextMessage={setIsPlacingContextMessage}
         />
         {/* <SpaceTextSeach /> */}
+        {spaceId === undefined && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 z-[1000] bg-gray-200 flex items-center justify-center rounded-sm">
+            <div className="flex flex-col items-center justify-center w-full gap-2 p-2">
+              <SquareMousePointer className="h-20 w-20" color="black" />
+              <h2 className="text-lg text-muted-foreground text-center">
+                Create or select a space to start
+              </h2>
+            </div>
+          </div>
+        )}
       </SignedIn>
       <ScrollModeButton
         toggleScrollMode={setIsScrollMode}
@@ -263,12 +274,12 @@ const Flow = () => {
         onNodeDragStop={onNodeDragStop}
         onNodesChange={onNodesChange}
         onPaneClick={onPaneClick}
-        panOnDrag={!isScrollMode && !isEnteringText}
+        panOnDrag={!isScrollMode && !isEnteringText && spaceId !== undefined}
         panOnScroll={isScrollMode}
         panOnScrollMode={PanOnScrollMode.Vertical}
         panOnScrollSpeed={1}
         // zoomOnPinch={!isScrollMode}
-        zoomOnScroll={!isScrollMode && !isEnteringText}
+        zoomOnScroll={!isScrollMode && !isEnteringText && spaceId !== undefined}
       >
         <Controls position="top-right" />
         <MiniMap

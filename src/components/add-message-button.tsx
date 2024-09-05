@@ -1,6 +1,7 @@
 // External Dependencies
 import { Dispatch, SetStateAction } from 'react';
 import { LoaderCircle, PlusCircle } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 // Relative Dependencies
 import { Button } from './ui/button';
@@ -14,9 +15,11 @@ const AddMessageButton = ({
   isNewRootMessageLoading,
   setIsPlacingRootMessage,
 }: Props) => {
+  const { spaceId } = useParams();
+
   return (
     <div className="absolute right-[50px] top-[12px] hover:cursor-pointer z-50">
-      <Button onClick={() => setIsPlacingRootMessage(true)}>
+      <Button onClick={() => setIsPlacingRootMessage(true)} disabled={!spaceId}>
         {isNewRootMessageLoading ? (
           <LoaderCircle className="size-6 animate-spin text-muted-foreground mr-2" />
         ) : (
