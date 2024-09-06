@@ -2,8 +2,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
 import { client } from '@/lib/hono';
+import axios from 'axios';
 
 // Relative Dependencies
+import { useGetApiKeys } from './use-get-api-keys';
 
 interface Model {
   name: string;
@@ -15,16 +17,22 @@ export type MessagesResponseType = InferResponseType<
 >;
 
 export const useGetOllamaModels = () => {
+  const { data } = useGetApiKeys();
+
   const query = useQuery({
     queryKey: ['ollama-models'],
     queryFn: async () => {
-      const response = await client.api.messages['ollama-models'].$get();
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch spaces');
+      if (!data?.apiKeys?.ollamaUrl) {
+        throw new Error('No ollama url');
       }
 
-      const models = (await response.json()).data.models as Model[];
+      const response = await axios.get(`${data?.apiKeys?.ollamaUrl}/api/tags`);
+
+      if (response.status !== 200) {
+        throw new Error('Failed to local ollama models');
+      }
+
+      const models = (await response.data).models as Model[];
 
       return models;
     },
