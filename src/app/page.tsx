@@ -4,13 +4,13 @@
 import { ReactFlowProvider } from '@xyflow/react';
 
 // Relative Dependencies
-import EditorCanvas from '../components/editor-canvas';
+import MessageCanvas from '../components/MessageCanvas';
 
 export default function Home() {
   return (
     <div style={{ position: 'fixed', inset: 0 }}>
       <ReactFlowProvider>
-        <EditorCanvas />
+        <MessageCanvas />
       </ReactFlowProvider>
     </div>
   );

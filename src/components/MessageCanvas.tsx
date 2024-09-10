@@ -36,7 +36,7 @@ import { useCreateRootMessage } from '@/hooks/use-create-root-message';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
-const Flow = () => {
+const MessageCanvas = () => {
   const [isScrollMode, setIsScrollMode] = useState(false);
   const [isEnteringText, setIsEnteringText] = useState(false);
   const [nodes, setNodes] = useState<MessageNodeType[]>([]);
@@ -294,4 +294,4 @@ const Flow = () => {
   );
 };
 
-export default Flow;
+export default MessageCanvas;
