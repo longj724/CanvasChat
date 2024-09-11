@@ -20,7 +20,7 @@ import '@xyflow/react/dist/style.css';
 import { useParams } from 'next/navigation';
 import { SignedIn } from '@clerk/nextjs';
 import { useReactFlow } from '@xyflow/react';
-import { SquareMousePointer } from 'lucide-react';
+import { LoaderCircle, SquareMousePointer } from 'lucide-react';
 
 // Relative Dependencies
 import MessageNode, { MessageNodeType } from './customNode';
@@ -244,6 +244,15 @@ const MessageCanvas = () => {
                 Create or select a space to start
               </h2>
             </div>
+          </div>
+        )}
+        {messagesQuery.isPending && (
+          <div className="absolute right-[50px] top-[140px] hover:cursor-pointer z-50 flex gap-2">
+            <p className="text-black">Loading Messages</p>
+            <LoaderCircle
+              className="animate-spin text-muted-foreground"
+              size={20}
+            />
           </div>
         )}
       </SignedIn>
