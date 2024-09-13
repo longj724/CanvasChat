@@ -246,7 +246,7 @@ const MessageCanvas = () => {
             </div>
           </div>
         )}
-        {messagesQuery.isPending && (
+        {messagesQuery.isPending && spaceId !== undefined && (
           <div className="absolute right-[50px] top-[140px] hover:cursor-pointer z-50 flex gap-2">
             <p className="text-black">Loading Messages</p>
             <LoaderCircle
