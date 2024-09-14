@@ -30,7 +30,6 @@ const SpaceTextSeach = () => {
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('value', e.target.value);
     setSearchValue(e.target.value);
   };
 
@@ -39,6 +38,43 @@ const SpaceTextSeach = () => {
       debouncedSave(searchValue);
     }
   }, [debouncedSave, searchValue]);
+
+  const extractWordContext = (
+    text: string,
+    word: string,
+    beforeWords = 4,
+    afterWords = 10
+  ) => {
+    const lowercaseWord = word.toLowerCase();
+    const words = text.split(/\s+/);
+
+    const wordArrayIndex = words.findIndex((w) =>
+      w.toLowerCase().includes(lowercaseWord)
+    );
+
+    const startIndex = Math.max(0, wordArrayIndex - beforeWords);
+    const endIndex = Math.min(words.length, wordArrayIndex + afterWords + 1);
+
+    const wordsBefore = words.slice(startIndex, wordArrayIndex);
+    const wordsAfter = words.slice(wordArrayIndex + 1, endIndex);
+
+    return {
+      wordsBefore: wordsBefore.join(' '),
+      wordsAfter: wordsAfter.join(' '),
+    };
+  };
+
+  const highlightedSearchResponse = (text: string, word: string) => {
+    const { wordsBefore, wordsAfter } = extractWordContext(text, word);
+
+    return (
+      <>
+        <span>{wordsBefore} </span>
+        <span className="bg-yellow-300 font-bold text-black">{word}</span>
+        <span> {wordsAfter}</span>
+      </>
+    );
+  };
 
   return (
     <div className="absolute left-1/2 transform -translate-x-1/2 top-[12px] w-128 flex flex-col gap-2 items-center z-50">
@@ -97,13 +133,21 @@ const SpaceTextSeach = () => {
                   result.userMessage.includes(searchValue) ? (
                     <div className="flex flex-col gap-2 h-20 w-96">
                       <p>User Message:</p>
-                      <p className="truncate">{result.userMessage}</p>
+                      <p className="truncate">
+                        {highlightedSearchResponse(
+                          result.userMessage as string,
+                          searchValue
+                        )}
+                      </p>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2 h-20 w-96">
                       <p>Response Message:</p>
                       <p className="overflow-hidden text-ellipsis">
-                        {result.response}
+                        {highlightedSearchResponse(
+                          result.response as string,
+                          searchValue
+                        )}
                       </p>
                     </div>
                   )}
@@ -118,7 +162,7 @@ const SpaceTextSeach = () => {
         !isPending &&
         data?.data.messages.length === 0 &&
         !error && (
-          <div className="text-center text-sm text-gray-500">
+          <div className="text-center text-sm text-black bg-white">
             No results found
           </div>
         )}

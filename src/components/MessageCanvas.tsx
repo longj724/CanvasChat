@@ -128,14 +128,6 @@ const MessageCanvas = () => {
   }, [messagesQuery.data]);
 
   useEffect(() => {
-    if (position) {
-      const [x, y] = position.split(',').map((num) => Number(num));
-      setCenter(x, y, {
-        zoom: 0.5,
-        duration: 800,
-      });
-    }
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 's' || event.key === 'S') {
         if (event.metaKey || event.ctrlKey) {
@@ -155,6 +147,16 @@ const MessageCanvas = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    if (position) {
+      const [x, y] = position.split(',').map((num) => Number(num));
+      setCenter(x, y, {
+        zoom: 0.5,
+        duration: 800,
+      });
+    }
+  }, [position]);
 
   const onNodeDragStop = (event: React.MouseEvent, node: Node) => {
     updateMessageMutation.mutate({
