@@ -235,9 +235,9 @@ const MessageCanvas = () => {
           isNewContextMessageLoading={isNewContextMessageLoading}
           setIsPlacingContextMessage={setIsPlacingContextMessage}
         />
-        {/* <SpaceTextSeach /> */}
+        <SpaceTextSeach />
         {spaceId === undefined && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 z-[1000] bg-gray-200 flex items-center justify-center rounded-sm">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 z-[25] h-48 bg-gray-200 flex items-center justify-center rounded-sm">
             <div className="flex flex-col items-center justify-center w-full gap-2 p-2">
               <SquareMousePointer className="h-20 w-20" color="black" />
               <h2 className="text-lg text-muted-foreground text-center">

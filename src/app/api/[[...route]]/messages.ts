@@ -544,7 +544,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      // TODO: Not used right now
       const { searchValue } = c.req.valid('json');
       const auth = getAuth(c);
 
