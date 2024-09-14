@@ -9,9 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSearchMessages } from '@/hooks/use-search-messages';
 
-type Props = {};
-
-const SpaceTextSeach = (props: Props) => {
+const SpaceTextSeach = () => {
   const [searchValue, setSearchValue] = useState('');
   const router = useRouter();
   const {
@@ -24,7 +22,6 @@ const SpaceTextSeach = (props: Props) => {
 
   const debouncedSave = useCallback(
     _.debounce((value: string) => {
-      console.log('calling this');
       searchMessagesMutation({
         searchValue: value,
       });
