@@ -34,7 +34,7 @@ import { useSendMessage } from '@/hooks/use-send-message';
 import { useCreateChildMessage } from '@/hooks/use-create-child-message';
 import { WithTooltip } from '@/components/ui/with-tooltip';
 import { useDeleteMessage } from '@/hooks/use-delete-message';
-import { useGetOllamaModels } from '@/hooks/use-get-ollama-models';
+// import { useGetOllamaModels } from '@/hooks/use-get-ollama-models';
 import FileUploadedNotification from './FileUploadedNotification';
 import { useGetApiKeys } from '@/hooks/use-get-api-keys';
 import SystemMessageInput from './SystemMessageInput';
@@ -110,7 +110,7 @@ const MessageNode = ({
   const deleteMessageMutation = useDeleteMessage(spaceId);
   const { data: apiKeyData } = useGetApiKeys();
 
-  const ollamaModelsQuery = useGetOllamaModels();
+  // const ollamaModelsQuery = useGetOllamaModels();
 
   useEffect(() => {
     setWidth(initialWidth);
@@ -366,7 +366,7 @@ const MessageNode = ({
                       ' - No Anthropic API Key Added'}
                   </SelectItem>
                 </SelectGroup>
-                <SelectGroup>
+                {/* <SelectGroup>
                   <SelectLabel>Ollama</SelectLabel>
                   {ollamaModelsQuery?.data?.map((model) => (
                     <SelectItem
@@ -380,7 +380,7 @@ const MessageNode = ({
                         ' - No Ollama Url Added'}
                     </SelectItem>
                   ))}
-                </SelectGroup>
+                </SelectGroup> */}
               </SelectContent>
             </Select>
             <div className="flex items-center ml-auto gap-2">

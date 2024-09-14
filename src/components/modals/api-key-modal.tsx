@@ -42,7 +42,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
   const formSchema = z.object({
     anthropic: z.string(),
     groq: z.string(),
-    ollamaUrl: z.string(),
+    // ollamaUrl: z.string(),
     openAI: z.string(),
   });
 
@@ -52,7 +52,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
     defaultValues: {
       anthropic: '',
       groq: '',
-      ollamaUrl: '',
+      // ollamaUrl: '',
       openAI: '',
     },
   });
@@ -64,7 +64,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
       reset({
         anthropic: data.apiKeys?.anthropic || '',
         groq: data.apiKeys?.groq || '',
-        ollamaUrl: data.apiKeys?.ollamaUrl || '',
+        // ollamaUrl: data.apiKeys?.ollamaUrl || '',
         openAI: data.apiKeys?.openAI || '',
       });
     }
@@ -78,9 +78,9 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
           ((data?.apiKeys.anthropic as string) ? '' : undefined),
         groqKey:
           values.groq || ((data?.apiKeys.groq as string) ? '' : undefined),
-        ollamaUrl:
-          values.ollamaUrl ||
-          ((data?.apiKeys.ollamaUrl as string) ? '' : undefined),
+        // ollamaUrl:
+        //   values.ollamaUrl ||
+        //   ((data?.apiKeys.ollamaUrl as string) ? '' : undefined),
         openAIKey:
           values.openAI || ((data?.apiKeys.openAI as string) ? '' : undefined),
       },
@@ -99,7 +99,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
       <DialogContent className="w-1/2 sm:w-3/5">
         <DialogHeader>
           <DialogTitle className="mb-2">API Keys</DialogTitle>
-          <DialogDescription>Set Your API Keys</DialogDescription>
+          <DialogDescription>Set your API keys</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -145,7 +145,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="ollamaUrl"
               render={({ field }) => (
@@ -157,7 +157,7 @@ const ApiKeyModal = ({ open, setOpen }: Props) => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <Button type="submit" className="ml-auto">
               Submit
