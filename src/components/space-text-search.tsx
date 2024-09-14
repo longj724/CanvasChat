@@ -90,7 +90,11 @@ const SpaceTextSeach = (props: Props) => {
                 <li
                   key={index}
                   className="p-4 hover:bg-gray-50 hover:cursor-pointer"
-                  onClick={() => router.push(`/space/${result.spaceId}`)}
+                  onClick={() =>
+                    router.push(
+                      `/space/${result.spaceId}?position=${result.xPosition},${result.yPosition}`
+                    )
+                  }
                 >
                   {result.userMessage !== null &&
                   result.userMessage.includes(searchValue) ? (

@@ -21,6 +21,7 @@ import { useParams } from 'next/navigation';
 import { SignedIn } from '@clerk/nextjs';
 import { useReactFlow } from '@xyflow/react';
 import { LoaderCircle, SquareMousePointer } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 // Relative Dependencies
 import MessageNode, { MessageNodeType } from './customNode';
@@ -48,10 +49,12 @@ const MessageCanvas = () => {
     useState(false);
 
   const { spaceId } = useParams();
-  const { addNodes, screenToFlowPosition } = useReactFlow();
+  const { addNodes, screenToFlowPosition, setCenter } = useReactFlow();
   const messagesQuery = useGetMessages(spaceId as string);
   const updateMessageMutation = useUpdateMessage();
   const createRootMessageMutation = useCreateRootMessage();
+  const searchParams = useSearchParams();
+  const position = searchParams.get('position');
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -125,6 +128,14 @@ const MessageCanvas = () => {
   }, [messagesQuery.data]);
 
   useEffect(() => {
+    if (position) {
+      const [x, y] = position.split(',').map((num) => Number(num));
+      setCenter(x, y, {
+        zoom: 0.5,
+        duration: 800,
+      });
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 's' || event.key === 'S') {
         if (event.metaKey || event.ctrlKey) {
