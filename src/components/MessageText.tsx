@@ -97,7 +97,7 @@ const MessageText = ({
     >
       <div className="flex w-11/12 flex-col ">
         <div className="flex flex-row items-center gap-2 py-2">
-          <Image
+          <img
             src={type === 'user' ? user?.imageUrl ?? '' : getModelLogo()}
             width={30}
             height={30}

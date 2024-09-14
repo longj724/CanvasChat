@@ -12,6 +12,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'FlowChat',
   description: 'A canvas for chatting with AI',
+  icons: [{ rel: 'icon', url: '/logo.ico' }],
 };
 
 export default function RootLayout({

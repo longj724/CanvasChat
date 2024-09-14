@@ -33,7 +33,7 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
     <nav className="flex flex-col h-full w-full">
       <ApiKeyModal open={apiKeyModalOpen} setOpen={setApiKeyModalOpen} />
       <div className="flex flex-row h-14 items-center justify-center border-b  w-full gap-1">
-        <PanelsTopLeft className="h-6 w-6" />
+        <img src="/logo.svg" alt="FlowChat Icon" height={24} width={24} />
         {isOpen && <span className="">FlowChat</span>}
       </div>
       <SignedIn>
