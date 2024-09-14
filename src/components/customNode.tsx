@@ -152,7 +152,7 @@ const MessageNode = ({
       parentMessageId: id,
       previousMessageContext: newPreviousMessageContext,
       spaceId,
-      width: 750,
+      width: 1000,
       xPosition: positionAbsoluteX,
       yPosition: positionAbsoluteY + height + 100,
     });
@@ -178,7 +178,7 @@ const MessageNode = ({
       },
       type: 'messageNode',
       style: {
-        width: 750,
+        width: 1000,
       },
     };
 
@@ -312,15 +312,6 @@ const MessageNode = ({
                     value="gpt-4-turbo"
                   >
                     gpt-4-turbo{' '}
-                    {!apiKeyData?.apiKeys?.openAI &&
-                      ' - No OpenAI API Key Added'}
-                  </SelectItem>
-                  <SelectItem
-                    className="hover:cursor-pointer"
-                    disabled={!apiKeyData?.apiKeys?.openAI}
-                    value="gpt-4-0125-preview"
-                  >
-                    gpt-4-0125-preview{' '}
                     {!apiKeyData?.apiKeys?.openAI &&
                       ' - No OpenAI API Key Added'}
                   </SelectItem>

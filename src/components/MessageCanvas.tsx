@@ -181,7 +181,7 @@ const MessageCanvas = () => {
         const { data } = await createRootMessageMutation.mutateAsync({
           isSystemMessage: isPlacingContextMessage,
           spaceId: spaceId as string,
-          width: 750,
+          width: 1000,
           xPosition: position.x,
           yPosition: position.y,
         });
@@ -209,7 +209,7 @@ const MessageCanvas = () => {
           type: 'messageNode',
           style: {
             // TOOD: Figure out how to calculate dynamic zIndex
-            width: 750,
+            width: 1000,
             zIndex: 1000,
           },
         };
