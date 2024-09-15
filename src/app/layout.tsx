@@ -10,7 +10,7 @@ import { Providers } from '../components/sidebar/providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'FlowChat',
+  title: 'CanvasChat',
   description: 'A canvas for chatting with AI',
   icons: [{ rel: 'icon', url: '/logo.ico' }],
 };

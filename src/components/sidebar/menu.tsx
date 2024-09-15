@@ -2,7 +2,7 @@
 
 // External Dependencies
 import { Dispatch, SetStateAction, useState } from 'react';
-import { CircleUserRound, Key, PanelsTopLeft } from 'lucide-react';
+import { CircleUserRound, Key } from 'lucide-react';
 import {
   SignedIn,
   SignedOut,
@@ -33,8 +33,8 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
     <nav className="flex flex-col h-full w-full">
       <ApiKeyModal open={apiKeyModalOpen} setOpen={setApiKeyModalOpen} />
       <div className="flex flex-row h-14 items-center justify-center border-b  w-full gap-1">
-        <img src="/logo.svg" alt="FlowChat Icon" height={24} width={24} />
-        {isOpen && <span className="">FlowChat</span>}
+        <img src="/logo.svg" alt="CanvasChat Icon" height={24} width={24} />
+        {isOpen && <span className="">CanvasChat</span>}
       </div>
       <SignedIn>
         {isOpen ? (
