@@ -7,7 +7,13 @@ import {
   ResizeDragEvent,
   useReactFlow,
 } from '@xyflow/react';
-import { LocateFixed, Maximize2, PlusCircle, Trash } from 'lucide-react';
+import {
+  LoaderCircle,
+  LocateFixed,
+  Maximize2,
+  PlusCircle,
+  Trash,
+} from 'lucide-react';
 import _ from 'lodash';
 
 // Relative Dependencies
@@ -476,12 +482,20 @@ const MessageNode = ({
           <CardFooter className="flex-row gap-2">
             <Button
               className="w-full"
-              disabled={!userMessage && !isSendingMessage}
+              disabled={
+                (!userMessage && !isSendingMessage) ||
+                createChildMessageMutation.isPending
+              }
               onClick={() => handleAddBottomNode(false)}
               size="sm"
               variant="outline"
             >
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Message
+              {createChildMessageMutation.isPending ? (
+                <LoaderCircle className="animate-spin text-muted-foreground mr-2 size-4" />
+              ) : (
+                <PlusCircle className="mr-2 size-4" />
+              )}{' '}
+              Add Message
             </Button>
             <Button
               className="w-full"
