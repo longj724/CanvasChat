@@ -235,7 +235,7 @@ const MessageNode = ({
     if (width !== initialWidth) {
       debouncedSave(width);
     }
-  }, [width]);
+  }, [debouncedSave, initialWidth, width]);
 
   return (
     <>

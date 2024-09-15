@@ -1,6 +1,7 @@
 // External Dependencies
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 
 // Relative Dependencies
 import './globals.css';
@@ -21,13 +22,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Providers>
-      <html lang="en">
-        <body className={inter.className}>
-          {children}
-          <Toaster />
-        </body>
-      </html>
-    </Providers>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Providers>
+        <html lang="en">
+          <body className={inter.className}>
+            {children}
+            <Toaster />
+          </body>
+        </html>
+      </Providers>
+    </Suspense>
   );
 }

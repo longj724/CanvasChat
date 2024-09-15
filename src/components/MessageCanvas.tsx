@@ -34,6 +34,7 @@ import ScrollModeButton from './scroll-mode-button';
 import SpaceTextSeach from './space-text-search';
 import CursorTooltip from './customTooltip';
 import { useCreateRootMessage } from '@/hooks/use-create-root-message';
+import { create } from 'lodash';
 
 const initialEdges = [{ id: '1->2', source: '1', target: '2' }];
 
@@ -125,7 +126,7 @@ const MessageCanvas = () => {
     if (edges) {
       setEdges(edges);
     }
-  }, [messagesQuery.data]);
+  }, [messagesQuery.data, setEdges]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -156,7 +157,7 @@ const MessageCanvas = () => {
         duration: 800,
       });
     }
-  }, [position]);
+  }, [position, setCenter]);
 
   const onNodeDragStop = (event: React.MouseEvent, node: Node) => {
     updateMessageMutation.mutate({
@@ -228,11 +229,12 @@ const MessageCanvas = () => {
       }
     },
     [
-      isPlacingRootMessage,
-      isPlacingContextMessage,
-      nodes,
       addNodes,
+      createRootMessageMutation,
+      isPlacingContextMessage,
+      isPlacingRootMessage,
       screenToFlowPosition,
+      spaceId,
     ]
   );
 
