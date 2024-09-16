@@ -23,7 +23,9 @@ const MessageMarkdown = ({ content }: Props) => {
         },
         // @ts-ignore
         img({ node, ...props }) {
-          return <img className="max-w-[67%]" {...props} />;
+          return (
+            <img className="max-w-[67%]" {...props} alt="Chat Response Image" />
+          );
         },
         // @ts-ignore
         code({ node, className, children, ...props }) {
