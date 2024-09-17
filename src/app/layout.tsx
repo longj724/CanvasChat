@@ -22,15 +22,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Providers>
-        <html lang="en">
+    <Providers>
+      <html lang="en">
+        <Suspense fallback={<div>Loading...</div>}>
           <body className={inter.className}>
             {children}
             <Toaster />
           </body>
-        </html>
-      </Providers>
-    </Suspense>
+        </Suspense>
+      </html>
+    </Providers>
   );
 }
