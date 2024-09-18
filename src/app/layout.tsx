@@ -24,12 +24,10 @@ export default function RootLayout({
   return (
     <Providers>
       <html lang="en">
-        <Suspense fallback={<div>Loading...</div>}>
-          <body className={inter.className}>
-            {children}
-            <Toaster />
-          </body>
-        </Suspense>
+        <body className={inter.className}>
+          {children}
+          <Toaster />
+        </body>
       </html>
     </Providers>
   );

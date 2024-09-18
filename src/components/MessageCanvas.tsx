@@ -1,3 +1,5 @@
+'use client';
+
 // External Dependencies
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
