@@ -111,7 +111,7 @@ const SpaceTextSeach = () => {
 
       {error && (
         <div className="text-center text-sm text-red-500">
-          Error Fething Results
+          Error Fetching Results
         </div>
       )}
 
