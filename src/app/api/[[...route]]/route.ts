@@ -12,7 +12,6 @@ import users from './users';
 export const runtime = 'nodejs';
 
 const app = new Hono().basePath('/api');
-app.use('*', clerkMiddleware());
 app.use(
   '*',
   cors({
@@ -29,6 +28,7 @@ app.use(
     credentials: true,
   })
 );
+app.use('*', clerkMiddleware());
 
 const routes = app
   .route('/spaces', spaces)
