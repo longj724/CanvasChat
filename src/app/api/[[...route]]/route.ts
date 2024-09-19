@@ -12,22 +12,7 @@ import users from './users';
 export const runtime = 'nodejs';
 
 const app = new Hono().basePath('/api');
-app.use(
-  '/api/*',
-  cors({
-    origin: ['https://canvaschat.xyz', 'https://www.canvaschat.xyz'],
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowHeaders: [
-      'Accept',
-      'Authorization',
-      'Content-Length',
-      'Content-Type',
-      'Origin',
-    ],
-    maxAge: 600,
-    credentials: true,
-  })
-);
+app.use('/api/*', cors());
 app.use('*', clerkMiddleware());
 
 const routes = app
