@@ -13,7 +13,7 @@ export const runtime = 'nodejs';
 
 const app = new Hono().basePath('/api');
 app.use(
-  '*',
+  '/api/*',
   cors({
     origin: ['https://canvaschat.xyz', 'https://www.canvaschat.xyz'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
