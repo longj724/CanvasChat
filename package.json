@@ -59,7 +59,7 @@
     "drizzle-orm": "^0.32.1",
     "embla-carousel-react": "^8.1.7",
     "gpt-tokenizer": "^2.2.1",
-    "hono": "^4.5.2",
+    "hono": "^4.6.2",
     "input-otp": "^1.2.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.412.0",
