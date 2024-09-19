@@ -3,7 +3,6 @@ import { useRef, useState, Dispatch, SetStateAction, useEffect } from 'react';
 import {
   LoaderCircle,
   LocateFixed,
-  Paperclip,
   PlusCircle,
   Save,
   Trash,
@@ -11,6 +10,7 @@ import {
 import { useAuth } from '@clerk/nextjs';
 import { toast } from 'sonner';
 import { useStoreApi } from '@xyflow/react';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Relative Dependencies
 import {
@@ -35,6 +35,7 @@ type Props = {
   handleDeleteNode: () => void;
   messageId: string;
   setUploadedFiles: Dispatch<SetStateAction<FileUploadData[]>>;
+  spaceId: string;
   togglePanning: Dispatch<SetStateAction<boolean>>;
   uploadedFiles: FileUploadData[];
 };
@@ -46,17 +47,20 @@ const SystemMessageInput = ({
   handleDeleteNode,
   messageId,
   setUploadedFiles,
+  spaceId,
   togglePanning,
   uploadedFiles,
 }: Props) => {
   const [userInput, setUserInput] = useState('');
   const [isFileUploading, setIsFileUploading] = useState(false);
+  const [isSavingMessage, setIsSavingMessage] = useState(false);
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { getToken } = useAuth();
   const store = useStoreApi();
   const updateMessageMutation = useUpdateMessage();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (context) {
@@ -65,14 +69,24 @@ const SystemMessageInput = ({
   }, [context]);
 
   const handleSaveMessage = async () => {
+    setIsSavingMessage(true);
     if (!userInput) {
       return;
     }
 
-    updateMessageMutation.mutate({
-      messageId: messageId,
-      context: userInput,
-    });
+    await updateMessageMutation.mutateAsync(
+      {
+        messageId: messageId,
+        context: userInput,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['messages', spaceId] });
+        },
+      }
+    );
+
+    setIsSavingMessage(false);
   };
 
   const handleUpload = async (file: File) => {
@@ -213,14 +227,27 @@ const SystemMessageInput = ({
                   disabled={context !== null}
                 /> */}
 
-                <Save
-                  className={cn(
-                    'rounded bg-primary p-1 text-secondary hover:opacity-50',
-                    !userInput ||
-                      (context !== null && 'cursor-not-allowed opacity-50')
-                  )}
-                  onClick={handleSaveMessage}
-                  size={30}
+                {context === undefined && <p className="mr-2">Unsaved</p>}
+
+                <WithTooltip
+                  delayDuration={200}
+                  display={<p>Save</p>}
+                  side="top"
+                  trigger={
+                    isSavingMessage ? (
+                      <LoaderCircle className="animate-spin text-muted-foreground mr-2" />
+                    ) : (
+                      <Save
+                        className={cn(
+                          'rounded bg-primary p-1 text-secondary hover:opacity-50',
+                          (!userInput || context !== undefined) &&
+                            'cursor-not-allowed opacity-50'
+                        )}
+                        onClick={handleSaveMessage}
+                        size={30}
+                      />
+                    )
+                  }
                 />
               </div>
             </div>

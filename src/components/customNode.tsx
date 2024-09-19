@@ -286,6 +286,7 @@ const MessageNode = ({
           handleDeleteNode={handleDeleteNode}
           messageId={id}
           setUploadedFiles={setUploadedFiles}
+          spaceId={spaceId}
           togglePanning={togglePanning}
           uploadedFiles={uploadedFiles}
         />
