@@ -1,5 +1,6 @@
 // External Dependencies
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { handle } from 'hono/vercel';
 import { clerkMiddleware } from '@hono/clerk-auth';
 
@@ -12,6 +13,22 @@ export const runtime = 'nodejs';
 
 const app = new Hono().basePath('/api');
 app.use('*', clerkMiddleware());
+app.use(
+  '*',
+  cors({
+    origin: 'https://canvaschat.xyz',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowHeaders: [
+      'Accept',
+      'Authorization',
+      'Content-Length',
+      'Content-Type',
+      'Origin',
+    ],
+    maxAge: 600,
+    credentials: true,
+  })
+);
 
 const routes = app
   .route('/spaces', spaces)

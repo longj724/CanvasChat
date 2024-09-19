@@ -415,23 +415,6 @@ const app = new Hono()
           .from(models)
           .where(eq(models.name, body.model as string));
 
-        if (!modelRow.length) {
-          const { data } = await axios.post('http://localhost:11434/api/show', {
-            name: body.model as string,
-          });
-
-          const contextWindow = data.model_info[
-            'llama.context_length'
-          ] as number;
-
-          // For now not supporting local models that accept images
-          await db.insert(models).values({
-            name: body.model as string,
-            acceptsImages: false,
-            contextWindow: contextWindow,
-          });
-        }
-
         updateData.modelName = body.model;
       }
 
