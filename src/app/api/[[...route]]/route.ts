@@ -16,7 +16,7 @@ app.use('*', clerkMiddleware());
 app.use(
   '*',
   cors({
-    origin: 'https://canvaschat.xyz',
+    origin: ['https://canvaschat.xyz', 'https://www.canvaschat.xyz'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowHeaders: [
       'Accept',
