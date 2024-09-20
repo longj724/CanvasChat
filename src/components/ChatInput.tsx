@@ -162,7 +162,7 @@ const ChatInput = ({
       <div className="relative mt-3 flex h-60 w-full rounded-xl border-2 border-input">
         <TextareaAutosize
           textareaRef={chatInputRef}
-          className="text-md flex max-h-56 w-full resize-none rounded-md border-none bg-transparent py-2 pl-4 pr-20 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 touch-none"
+          className="text-[24px] flex max-h-56 w-full resize-none rounded-md border-none bg-transparent py-2 pl-4 pr-20 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 touch-none"
           placeholder={`Send a message...`}
           onValueChange={handleInputChange}
           value={userInput}

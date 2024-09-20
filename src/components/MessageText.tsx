@@ -104,7 +104,9 @@ const MessageText = ({
             alt="Model Logo"
             className="rounded-full"
           />
-          <h2 className="font-semibold">{type === 'user' ? 'You' : model}</h2>
+          <h2 className="font-semibold text-[24px]">
+            {type === 'user' ? 'You' : model}
+          </h2>
           <div className="ml-auto flex flex-row">
             <WithTooltip
               delayDuration={200}

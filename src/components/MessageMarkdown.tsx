@@ -19,7 +19,7 @@ const MessageMarkdown = ({ content }: Props) => {
       components={{
         // @ts-ignore
         p({ children }) {
-          return <p className="mb-2 last:mb-0">{children}</p>;
+          return <p className="mb-2 last:mb-0 text-[24px]">{children}</p>;
         },
         // @ts-ignore
         img({ node, ...props }) {
@@ -36,7 +36,11 @@ const MessageMarkdown = ({ content }: Props) => {
             : firstChild;
 
           if (firstChildAsString === '▍') {
-            return <span className="mt-1 animate-pulse cursor-default">▍</span>;
+            return (
+              <span className="mt-1 animate-pulse cursor-default text-[24px]">
+                ▍
+              </span>
+            );
           }
 
           if (typeof firstChildAsString === 'string') {
