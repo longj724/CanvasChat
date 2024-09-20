@@ -87,6 +87,7 @@ const SystemMessageInput = ({
     );
 
     setIsSavingMessage(false);
+    onLeave();
   };
 
   const handleUpload = async (file: File) => {
