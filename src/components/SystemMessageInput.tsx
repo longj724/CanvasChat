@@ -154,6 +154,7 @@ const SystemMessageInput = ({
   return (
     <Card onDoubleClick={handleCenterOnNode}>
       <CardHeader className="flex flex-row items-center justify-between">
+        <h2 className="text-[30px]">Context</h2>
         <div className="flex items-center ml-auto gap-2">
           <WithTooltip
             delayDuration={200}
@@ -180,7 +181,7 @@ const SystemMessageInput = ({
       <CardContent>
         {context ? (
           <div className={cn('flex w-full flex-row py-3 bg-muted/40')}>
-            <p className="ml-2">{context}</p>
+            <p className="ml-2 text-[24px]">{context}</p>
           </div>
         ) : (
           <div
