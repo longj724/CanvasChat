@@ -1,7 +1,8 @@
 'use client';
 
 // External Dependencies
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 
 // Relative Dependencies
 import { cn } from '@/lib/utils';
@@ -9,7 +10,14 @@ import { Menu } from '@/components/sidebar/menu';
 import { SidebarToggle } from '@/components/sidebar/sidebar-toggle';
 
 export function Sidebar() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      setSidebarOpen(true);
+    }
+  }, [user]);
 
   return (
     <aside

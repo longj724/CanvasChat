@@ -93,14 +93,14 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
               <div className="mt-2 w-full flex items-center justify-center">
                 <SignInButton mode="modal">
                   <Button className="w-4/5" variant={'outline'}>
-                    Sign in
+                    Sign In
                   </Button>
                 </SignInButton>
               </div>
 
               <div className="mt-2 w-full flex items-center justify-center">
                 <SignUpButton mode="modal">
-                  <Button className="w-4/5">Sign up</Button>
+                  <Button className="w-4/5">Sign Up</Button>
                 </SignUpButton>
               </div>
             </div>

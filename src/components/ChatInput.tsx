@@ -101,6 +101,7 @@ const ChatInput = ({
       fileUrls: uploadedFiles.map((file) => file.publicUrl),
     });
 
+    setIsSendingMessage(false);
     onLeave();
   };
 
