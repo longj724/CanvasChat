@@ -26,7 +26,7 @@ const LandingPage = () => {
             title="CanvasChatDemo"
           ></iframe>
         </div>
-        <script src="https://player.vimeo.com/api/player.js"></script>
+        <script src="https://player.vimeo.com/api/player.js" async></script>
       </div>
 
       <div className="absolute gap-2 top-[85%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center justify-center flex flex-row w-2/5 z-[25]">
