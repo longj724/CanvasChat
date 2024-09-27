@@ -34,6 +34,7 @@ type ChatInputProps = {
     },
     unknown
   >;
+  setHasSentMessage: Dispatch<SetStateAction<boolean>>;
   setIsSendingMessage: Dispatch<SetStateAction<boolean>>;
   setUploadedFiles: Dispatch<SetStateAction<FileUploadData[]>>;
   setUserInput: Dispatch<SetStateAction<string>>;
@@ -44,18 +45,19 @@ type ChatInputProps = {
 };
 
 const ChatInput = ({
+  setHasSentMessage,
+  isLoading,
   messageId,
   model,
   previousMessageContext,
-  setIsSendingMessage,
-  togglePanning,
   sendMessage,
-  isLoading,
-  streamingResponse,
+  setIsSendingMessage,
   setUploadedFiles,
   setUserInput,
-  userInput,
+  streamingResponse,
+  togglePanning,
   uploadedFiles,
+  userInput,
 }: ChatInputProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isFileUploading, setIsFileUploading] = useState(false);
@@ -90,6 +92,7 @@ const ChatInput = ({
 
   const handleSendMessage = async () => {
     setIsSendingMessage(true);
+    setHasSentMessage(true);
     const token = await getToken({ template: 'supabase' });
     sendMessage({
       messageId: messageId,

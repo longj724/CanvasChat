@@ -106,6 +106,7 @@ const MessageNode = ({
   const [userInput, setUserInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(model);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [hasSentMessage, setHasSentMessage] = useState(userMessage !== null);
   const [width, setWidth] = useState(initialWidth);
   const [uploadedFiles, setUploadedFiles] = useState<FileUploadData[]>([]);
 
@@ -236,6 +237,8 @@ const MessageNode = ({
       debouncedSave(width);
     }
   }, [debouncedSave, initialWidth, width]);
+
+  console.log('userMessage', userMessage);
 
   return (
     <>
@@ -421,7 +424,7 @@ const MessageNode = ({
                 togglePanning={togglePanning}
                 type="user"
               />
-            ) : isSendingMessage ? (
+            ) : hasSentMessage ? (
               <MessageText
                 content={userInput}
                 model={selectedModel}
@@ -453,7 +456,7 @@ const MessageNode = ({
                 type="system"
               />
             )}
-            {!userMessage && !isSendingMessage && (
+            {!userMessage && !isSendingMessage && !hasSentMessage && (
               <ChatInput
                 isLoading={isLoading}
                 messageId={id}
@@ -461,6 +464,7 @@ const MessageNode = ({
                 previousMessageContext={previousMessages}
                 sendMessage={sendMessage}
                 setIsSendingMessage={setIsSendingMessage}
+                setHasSentMessage={setHasSentMessage}
                 setUploadedFiles={setUploadedFiles}
                 setUserInput={setUserInput}
                 streamingResponse={streamingResponse}
