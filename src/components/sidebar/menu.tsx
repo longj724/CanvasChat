@@ -2,7 +2,7 @@
 
 // External Dependencies
 import { Dispatch, SetStateAction, useState } from 'react';
-import { CircleUserRound, Key } from 'lucide-react';
+import { CircleUserRound, Key, LoaderCircle } from 'lucide-react';
 import {
   SignedIn,
   SignedOut,
@@ -25,7 +25,7 @@ interface MenuProps {
 }
 
 export function Menu({ isOpen, setIsOpen }: MenuProps) {
-  const { data } = useGetSpaces();
+  const { data, isPending } = useGetSpaces();
 
   const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
 
@@ -50,9 +50,13 @@ export function Menu({ isOpen, setIsOpen }: MenuProps) {
               </div>
             </div>
             <div className="flex flex-col w-full gap-2 justify-center items-center">
-              {data?.spaces.map((space) => (
-                <Space key={space.id} space={space} />
-              ))}
+              {isPending ? (
+                <LoaderCircle className="animate-spin text-muted-foreground" />
+              ) : (
+                data?.spaces.map((space) => (
+                  <Space key={space.id} space={space} />
+                ))
+              )}
             </div>
           </>
         ) : (
