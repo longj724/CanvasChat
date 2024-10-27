@@ -25,8 +25,8 @@ export const modelNameToProvider = (modelName: string, apiKey: string) => {
         apiKey,
       });
       return groq(modelName);
-    case 'claude-3-5-sonnet-20240620':
-    case 'claude-3-opus-20240229':
+    case 'claude-3-5-sonnet-latest':
+    case 'claude-3-opus-latest':
     case 'claude-3-haiku-20240307':
       const anthropic = createAnthropic({
         apiKey,
@@ -50,8 +50,8 @@ export const modelNameToApiKeyType = (modelName: string) => {
     case 'llama-3.1-8b-instant':
     case 'mixtral-8x7b-32768':
       return 'groq';
-    case 'claude-3-5-sonnet-20240620':
-    case 'claude-3-opus-20240229':
+    case 'claude-3-5-sonnet-latest':
+    case 'claude-3-opus-latest':
     case 'claude-3-haiku-20240307':
       return 'anthropic';
     default:

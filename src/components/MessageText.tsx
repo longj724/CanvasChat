@@ -60,8 +60,8 @@ const MessageText = ({
     } else if (model === 'llama-3.1-8b-instant') {
       return 'https://utfs.io/f/5d86278f-f1a9-470f-8613-fe8dc1d102a0-q2n0kg.jpeg';
     } else if (
-      model === 'claude-3-5-sonnet-20240620' ||
-      model === 'claude-3-opus-20240229' ||
+      model === 'claude-3-5-sonnet-latest' ||
+      model === 'claude-3-opus-latest' ||
       model === 'claude-3-haiku-20240307'
     ) {
       return 'https://mwbkkujllezvgvvudxer.supabase.co/storage/v1/object/public/general/anthropic-logo.png';

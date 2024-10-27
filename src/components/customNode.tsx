@@ -351,18 +351,18 @@ const MessageNode = ({
                   <SelectItem
                     className="hover:cursor-pointer"
                     disabled={!apiKeyData?.apiKeys?.anthropic}
-                    value="claude-3-5-sonnet-20240620"
+                    value="claude-3-5-sonnet-latest"
                   >
-                    claude-3-5-sonnet-20240620{' '}
+                    claude-3-5-sonnet-latest{' '}
                     {!apiKeyData?.apiKeys?.anthropic &&
                       ' - No Anthropic API Key Added'}
                   </SelectItem>
                   <SelectItem
                     className="hover:cursor-pointer"
                     disabled={!apiKeyData?.apiKeys?.anthropic}
-                    value="claude-3-opus-20240229"
+                    value="claude-3-opus-latest"
                   >
-                    claude-3-opus-20240229{' '}
+                    claude-3-opus-latest{' '}
                     {!apiKeyData?.apiKeys?.anthropic &&
                       ' - No Anthropic API Key Added'}
                   </SelectItem>
