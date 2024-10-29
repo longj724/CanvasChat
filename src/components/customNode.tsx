@@ -488,7 +488,7 @@ const MessageNode = ({
             <Button
               className="w-full"
               disabled={
-                (!userMessage && !isSendingMessage) ||
+                (!userMessage && !isSendingMessage && !hasSentMessage) ||
                 createChildMessageMutation.isPending
               }
               onClick={() => handleAddBottomNode(false)}
